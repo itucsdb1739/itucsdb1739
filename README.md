@@ -1,11 +1,13 @@
 # itucsdb1739
 ITUPass - BLG361E Database Lecture Project
 
+[![Documentation Status](https://readthedocs.org/projects/itucsdb1739/badge/?version=latest)](http://itucsdb1739.readthedocs.io/en/latest/?badge=latest)
+
 # Project resources
 * [Source Code](https://github.com/itucsdb1739/itucsdb1739)
 * [Weekly Reports](https://github.com/itucsdb1739/itucsdb1739/wiki)
 * Demo Page
-* Documentation
+* [Documentation](https://itucsdb1739.readthedocs.io/en/latest/)
 
 # Quick Start:
 * `pip install --editable .`
