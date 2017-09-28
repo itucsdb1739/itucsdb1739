@@ -7,8 +7,15 @@ ITUPass - BLG361E Database Lecture Project
 * Demo Page
 * Documentation
 
+# Quick Start:
+* `pip install --editable .`
+* `export FLASK_APP=itupass`
+* `export FLASK_DEBUG=1`
+* `flask initdb`
+* `flask run`
+
 # Notice
-This is university project for BLG361E Database lecture and code contributions are not allowed till December 27, 2017
+This is a university project for BLG361E Database lecture and code contributions are not allowed till December 27, 2017
 
 Fill free to submit issues.
 

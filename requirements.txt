@@ -1,0 +1,6 @@
+Flask==0.12.2
+Flask-WTF==0.14.2
+Flask-Gravatar==0.4.2
+gunicorn
+psycopg2
+raven
