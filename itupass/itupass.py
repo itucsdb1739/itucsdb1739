@@ -1,6 +1,9 @@
 from flask import Flask, g, session
+from raven.contrib.flask import Sentry
 
 app = Flask('itupass')
+# SENTRY_DSN environ will be used for DSN
+sentry = Sentry(app)
 
 
 def get_db():

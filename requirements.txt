@@ -3,4 +3,5 @@ Flask-WTF==0.14.2
 Flask-Gravatar==0.4.2
 gunicorn
 psycopg2
+blinker
 raven
