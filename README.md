@@ -6,7 +6,7 @@ ITUPass - BLG361E Database Lecture Project
 # Project resources
 * [Source Code](https://github.com/itucsdb1739/itucsdb1739)
 * [Weekly Reports](https://github.com/itucsdb1739/itucsdb1739/wiki)
-* Demo Page
+* [Demo Page](https://itucsdb1739.mybluemix.net/)
 * [Documentation](https://itucsdb1739.readthedocs.io/en/latest/)
 
 # Quick Start:
