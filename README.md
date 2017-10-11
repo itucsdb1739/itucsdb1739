@@ -12,7 +12,9 @@ ITUPass - BLG361E Database Lecture Project
 # Quick Start:
 * `pip install --editable .`
 * `export FLASK_APP=itupass`
-* `export FLASK_DEBUG=1`
+* `export FLASK_DEBUG=1` (optional)
+* `export SECRET_KEY=Not#So@Secret` (optional)
+* `export DATABASE_URI=postgresql://...`
 * `flask initdb`
 * `flask run`
 

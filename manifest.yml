@@ -1,0 +1,10 @@
+applications:
+- services:
+  - ElephantSQL-itupass
+  disk_quota: 1024M
+  host: itucsdb1739
+  name: itucsdb1739
+  path: .
+  domain: mybluemix.net
+  instances: 1
+  memory: 128M

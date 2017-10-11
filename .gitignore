@@ -68,3 +68,6 @@ venv/
 
 # mkdocs documentation
 /site
+
+# SQLite:
+test.db
