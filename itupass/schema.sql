@@ -2,9 +2,10 @@ DROP TABLE IF EXISTS users CASCADE;
 CREATE TABLE users (
   id           SERIAL PRIMARY KEY,
   username     VARCHAR(50) UNIQUE,
-  password     VARCHAR(150),
+  password     VARCHAR(255),
   email        VARCHAR(100) UNIQUE,
   name         VARCHAR(200),
+  locale       VARCHAR(6),
   confirmed_at timestamp DEFAULT NULL,
   deleted      BOOLEAN   DEFAULT FALSE,
   is_staff     BOOLEAN   DEFAULT FALSE

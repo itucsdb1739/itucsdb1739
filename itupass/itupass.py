@@ -1,4 +1,5 @@
-from flask import Flask, g
+from flask import Flask, g, request
+from flask_babel import Babel
 from flask_login import LoginManager
 from flask_wtf.csrf import CSRFProtect
 from flask_gravatar import Gravatar
@@ -39,6 +40,8 @@ class Config(object):
     SECRET_KEY = os.environ.get("SECRET_KEY", "Not#So@Secret")
     SESSION_COOKIE_NAME = "Ssession"
     SECURITY_USER_IDENTITY_ATTRIBUTES = ['username', 'email']
+    BABEL_DEFAULT_LOCALE = "en"
+    BABEL_DEFAULT_TIMEZONE = "Europe/Istanbul"
 
 
 class ProductionConfig(Config):
@@ -66,7 +69,7 @@ def create_app():
     else:
         # Local or unknown environment
         app.config.from_object(Config)
-
+    babel = Babel(app)
     # Enable Sentry in production
     if 'SENTRY_DSN' in app.config:
         sentry = Sentry(app, dsn=app.config['SENTRY_DSN'])
@@ -81,10 +84,10 @@ def create_app():
     for view, url_prefix in DEFAULT_BLUEPRINTS:
         app.register_blueprint(view, url_prefix=url_prefix)
 
-    return app
+    return app, babel
 
 
-app = create_app()
+app, babel = create_app()
 
 
 def _connect_db(app):
@@ -117,6 +120,18 @@ def init_db(app):
 @app.cli.command('initdb')
 def initdb_command():
     """Initialize database tables and initial values."""
-    app = create_app()
+    from itupass.models import User
+    app, _ = create_app()
     init_db(app)
+    user = User.get(username='admin')
+    user.set_password('admin')
+    user.save()
     print('Initialized the database.')
+
+
+@babel.localeselector
+def get_locale():
+    user = getattr(g, 'user', None)
+    if user is not None:
+        return user.locale
+    return request.accept_languages.best_match(['en', 'tr', 'ru'])

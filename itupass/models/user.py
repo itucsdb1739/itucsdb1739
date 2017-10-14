@@ -17,13 +17,14 @@ class User(UserMixin):
         ('password', None),
         ('email', None),
         ('name', None),
+        ('locale', 'en'),
         ('confirmed_at', None),
         ('deleted', False),
         ('is_staff', False)
     ])
 
     def __init__(self, pk=None, username=None, password=None, email=None, name=None,
-                 confirmed_at=None, deleted=False, is_staff=False):
+                 locale='en', confirmed_at=None, deleted=False, is_staff=False):
         for key in self.columns:
             setattr(self, key, vars().get(key))
         if not self.pk and self.password:
@@ -44,6 +45,13 @@ class User(UserMixin):
     def check_password(self, password):
         """Check password match with hash."""
         return check_password_hash(self.password, password)
+
+    def get_values(self):
+        """Get values of object as dict object."""
+        values = self.columns.copy()
+        for key in self.columns:
+            values[key] = getattr(self, key)
+        return values
 
     @property
     def is_active(self):
@@ -141,18 +149,18 @@ class User(UserMixin):
     def save(self):
         db = get_database()
         cursor = db.cursor
-        data = self.columns
+        data = self.get_values()
         user = self.get(username=self.username)
         if user:
             # update old user
-            old_data = user.columns
+            old_data = user.get_values()
             diffkeys = [key for key in data if data[key] != old_data[key]]
             if not diffkeys:
                 # Nothing changed
                 return user
             filters = {}
             for key in diffkeys:
-                filters[key] = self.columns[key]
+                filters[key] = self.get_values()[key]
             query = "UPDATE {table} SET ".format(table=self.Meta.table_name)
             for key in filters:
                 query += key + ' = %(' + key + ')s, '
@@ -167,9 +175,9 @@ class User(UserMixin):
         # new user
         del data['pk']
         query = "INSERT INTO {table} " \
-                "(username, email, name, confirmed_at, is_staff, password) " \
+                "(username, email, name, locale, confirmed_at, is_staff, password) " \
                 "VALUES" \
-                "(%(username)s, %(email)s, %(name)s, %(confirmed_at)s, " \
+                "(%(username)s, %(email)s, %(name)s, %(locale)s, %(confirmed_at)s, " \
                 "%(is_staff)s, %(password)s)".format(table=self.Meta.table_name)
         cursor.execute(query, dict(data))
         db.commit()
