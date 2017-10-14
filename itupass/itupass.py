@@ -9,9 +9,14 @@ import json
 from raven.contrib.flask import Sentry
 
 from itupass import models
+from itupass import views
 
 
 __all__ = ['get_db', 'init_db', 'close_database']
+
+SUPPORTED_LANGUAGES = [
+    'en', 'tr', 'ru'
+]
 
 
 def vcap_to_uri():
@@ -23,6 +28,7 @@ def vcap_to_uri():
 
 DEFAULT_BLUEPRINTS = (
     # Add blueprints here
+    (views.client, ""),
 )
 
 # Login Manager
@@ -40,6 +46,7 @@ class Config(object):
     SECRET_KEY = os.environ.get("SECRET_KEY", "Not#So@Secret")
     SESSION_COOKIE_NAME = "Ssession"
     SECURITY_USER_IDENTITY_ATTRIBUTES = ['username', 'email']
+    LANGUAGES = SUPPORTED_LANGUAGES
     BABEL_DEFAULT_LOCALE = "en"
     BABEL_DEFAULT_TIMEZONE = "Europe/Istanbul"
 
@@ -134,4 +141,11 @@ def get_locale():
     user = getattr(g, 'user', None)
     if user is not None:
         return user.locale
-    return request.accept_languages.best_match(['en', 'tr', 'ru'])
+    return request.accept_languages.best_match(SUPPORTED_LANGUAGES)
+
+# Template contexts
+@app.context_processor
+def utility_processor():
+    def currentlocale():
+        return get_locale()
+    return dict(currentlocale=currentlocale)

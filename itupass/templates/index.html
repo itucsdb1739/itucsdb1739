@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}{% trans %}Home{% endtrans %}{% endblock %}
+{% block header %}
+<header class="masthead">
+  <div class="container h-100">
+    <div class="row h-100">
+      <div class="col-lg-7 my-auto">
+        <div class="header-content mx-auto">
+          <h1 class="mb-5">{% trans %}ITUPass gives recommendations for lectures, generates special calendar schedule for you and helps to connect with other students in class!{% endtrans %}</h1>
+          <a href="{{ url_for('client.login') }}" class="btn btn-outline btn-xl js-scroll-trigger">{% trans %}Join Now!{% endtrans %}</a>
+        </div>
+      </div>
+      <div class="col-lg-5 my-auto">
+        <div class="screen">
+          <!-- Demo image for screen mockup, you can put an image here, some HTML, an animation, video, or anything else! -->
+          <img src="{{ url_for('static', filename='img/demo-screen-1.png') }}" class="img-fluid" alt="">
+        </div>
+        <div class="button">
+          <!-- You can hook the "home button" to some JavaScript events or just remove it -->
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+{% endblock %}
+{% block content %}
+<section class="features bg-primary text-center" id="features">
+  <div class="container">
+    <div class="section-heading text-center">
+      <h2>{% trans %}Everything for Success{% endtrans %}</h2>
+      <p>ITUPass provides most usefull tools for successing in university!</p>
+    </div>
+    <div class="row">
+      <div class="col-lg-3 my-auto">
+        <div class="feature-item">
+          <i class="fa fa-book text-primary"></i>
+          <h3>{% trans %}Lectures{% endtrans %}</h3>
+          <p class="text-muted">{% trans %}Details and suggestions for each lecture created by anonym users{% endtrans %}</p>
+        </div>
+      </div>
+      <div class="col-lg-3 my-auto">
+        <div class="feature-item icon-blue">
+          <i class="fa fa-comments text-primary"></i>
+          <h3>{% trans %}Discussions{% endtrans %}</h3>
+          <p class="text-muted">{% trans %}Discuss in chat groups for lectures and projects or with induviduals such as students and teachers{% endtrans %}</p>
+        </div>
+      </div>
+      <div class="col-lg-3 my-auto">
+        <div class="feature-item icon-red">
+          <i class="fa fa-calendar text-primary"></i>
+          <h3>{% trans %}Schedule{% endtrans %}</h3>
+          <p class="text-muted">{% trans %}Automatically generates university schedule which can be exported to any calendar application using iCal format{% endtrans %}</p>
+        </div>
+      </div>
+      <div class="col-lg-3 my-auto">
+        <div class="feature-item icon-black">
+          <i class="fa fa-users text-primary"></i>
+          <h3>{% trans %}Project Groups{% endtrans %}</h3>
+          <p class="text-muted">{% trans %}Join to project groups and coordinate term projects together{% endtrans %}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="features bg-grey text-center" id="news">
+  <div class="container">
+    <div class="section-heading text-center">
+      <h2>{% trans %}News{% endtrans %}</h2>
+      <p>Latest announcements and events</p>
+    </div>
+  </div>
+</section>
+<section class="contact" id="contact">
+  <div class="container">
+    <h2><i class="fa fa-handshake-o"></i> with us!</h2>
+    <ul class="list-inline list-social">
+      <li class="list-inline-item social-github">
+        <a href="https://github.com/itucsdb1739" target="_blank" title="Github">
+          <i class="fa fa-github"></i>
+        </a>
+      </li>
+      <li class="list-inline-item social-twitter">
+        <a href="https://twitter.com/em94mu" target="_blank" title="Twitter">
+          <i class="fa fa-twitter"></i>
+        </a>
+      </li>
+      <li class="list-inline-item social-linkedin">
+        <a href="https://www.linkedin.com/in/mastizada/" target="_blank" title="Linkedin">
+          <i class="fa fa-linkedin"></i>
+        </a>
+      </li>
+      <li class="list-inline-item social-telegram">
+        <a href="https://t.me/mastizada" target="_blank" title="Telegram">
+          <i class="fa fa-telegram"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+</section>
+{% endblock %}

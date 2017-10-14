@@ -1,0 +1,33 @@
+section.features .icon-red i {
+  background-image: linear-gradient(to left, #555555, #ff0000);
+}
+section.features .icon-black i {
+  background-image: linear-gradient(to left, #121213, #000000);
+}
+section.features .icon-blue i {
+  background-image: linear-gradient(to left, #121213, #0000ff);
+}
+.bg-grey {
+  background: #42d738;
+  background: -webkit-linear-gradient(#fdc539, #42d738);
+  background: linear-gradient(#fdc539, #42d738);
+}
+section.contact ul.list-social li.social-github a {
+  background-color: #333333;
+}
+section.contact ul.list-social li.social-github a:hover {
+  color: #333333;
+  background-color: #f5f5f5;
+}
+section.contact ul.list-social li.social-linkedin a {
+  background-color: #0077b5;
+}
+section.contact ul.list-social li.social-linkedin a:hover {
+  background-color: #00a0dc;
+}
+section.contact ul.list-social li.social-telegram a {
+  background-color: #0088cc;
+}
+.text-muted {
+  color: #51575d !important;
+}

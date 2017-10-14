@@ -18,6 +18,12 @@ ITUPass - BLG361E Database Lecture Project
 * `flask initdb`
 * `flask run`
 
+# i18n:
+* generate pot file: `pybabel extract -F babel.cfg -o itupass/translations/messages.pot itupass`
+* Initialize po files: `pybabel init -i itupass/translations/messages.pot -d translations -l tr`
+* Compile translations: `pybabel compile -d itupass/translations`
+* Update translations from template: `pybabel update -i itupass/translations/messages.pot -d translations`
+
 # Notice
 This is a university project for BLG361E Database lecture and code contributions are not allowed till December 27, 2017
 
