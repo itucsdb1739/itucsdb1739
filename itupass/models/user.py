@@ -20,11 +20,12 @@ class User(UserMixin):
         ('locale', 'en'),
         ('confirmed_at', None),
         ('deleted', False),
+        ('is_teacher', False),
         ('is_staff', False)
     ])
 
     def __init__(self, pk=None, username=None, password=None, email=None, name=None,
-                 locale='en', confirmed_at=None, deleted=False, is_staff=False):
+                 locale='en', confirmed_at=None, deleted=False, is_teacher=False, is_staff=False):
         for key in self.columns:
             setattr(self, key, vars().get(key))
         if not self.pk and self.password:
@@ -57,7 +58,6 @@ class User(UserMixin):
     def is_active(self):
         return not self.deleted
 
-    @property
     def get_id(self):
         return str(self.pk)
 
@@ -175,13 +175,19 @@ class User(UserMixin):
         # new user
         del data['pk']
         query = "INSERT INTO {table} " \
-                "(username, email, name, locale, confirmed_at, is_staff, password) " \
+                "(username, email, name, locale, confirmed_at, is_teacher, is_staff, password) " \
                 "VALUES" \
-                "(%(username)s, %(email)s, %(name)s, %(locale)s, %(confirmed_at)s, " \
+                "(%(username)s, %(email)s, %(name)s, %(locale)s, %(confirmed_at)s, %(is_teacher)s, " \
                 "%(is_staff)s, %(password)s)".format(table=self.Meta.table_name)
         cursor.execute(query, dict(data))
         db.commit()
         return self.get(username=self.username)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *kwargs):
+        self.save()
 
     class Meta:
         table_name = 'users'

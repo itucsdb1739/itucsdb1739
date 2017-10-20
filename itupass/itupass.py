@@ -5,6 +5,7 @@ from flask_wtf.csrf import CSRFProtect
 from flask_gravatar import Gravatar
 import psycopg2
 import os
+from dotenv import load_dotenv, find_dotenv
 import json
 from raven.contrib.flask import Sentry
 
@@ -13,6 +14,8 @@ from itupass import views
 
 
 __all__ = ['get_db', 'init_db', 'close_database']
+
+load_dotenv(find_dotenv(), override=True)
 
 SUPPORTED_LANGUAGES = [
     'en', 'tr', 'ru'
@@ -44,6 +47,7 @@ class Config(object):
     TESTING = True
     DATABASE_URI = os.environ.get("DATABASE_URI")
     SECRET_KEY = os.environ.get("SECRET_KEY", "Not#So@Secret")
+    WTF_CSRF_SECRET_KEY = os.environ.get("SECRET_KEY", "Not#So@Secret")
     SESSION_COOKIE_NAME = "Ssession"
     SECURITY_USER_IDENTITY_ATTRIBUTES = ['username', 'email']
     LANGUAGES = SUPPORTED_LANGUAGES
@@ -130,9 +134,13 @@ def initdb_command():
     from itupass.models import User
     app, _ = create_app()
     init_db(app)
-    user = User.get(username='admin')
-    user.set_password('admin')
-    user.save()
+    DEFAULT_PASSWORDS = {
+        'admin': 'admin', 'teacher': 'teacher', 'tonystark': 'tester', 'elonmusk': 'tester',
+        'thor': 'godofthunder', 'banner': 'mrgreen'
+    }
+    for username in DEFAULT_PASSWORDS:
+        with User.get(username=username) as user:
+            user.set_password(DEFAULT_PASSWORDS[username])
     print('Initialized the database.')
 
 
