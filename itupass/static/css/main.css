@@ -28,6 +28,14 @@ section.contact ul.list-social li.social-linkedin a:hover {
 section.contact ul.list-social li.social-telegram a {
   background-color: #0088cc;
 }
+.error-message {
+  color: #ff0000;
+  font-weight: bold;
+  text-decoration: underline;
+}
 .text-muted {
   color: #51575d !important;
+}
+.col-centered {
+  margin: 0 auto;
 }

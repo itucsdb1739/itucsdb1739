@@ -4,6 +4,7 @@ Flask-Gravatar==0.4.2
 Flask-Login==0.4.0
 Flask-Babel==0.11.2
 Jinja2==2.9.6
+python-dotenv
 gunicorn
 psycopg2
 blinker
