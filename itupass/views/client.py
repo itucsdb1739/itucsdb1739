@@ -52,6 +52,20 @@ def register():
     return render_template('user/register.html', form=form)
 
 
+@client.route("/i18n/change/", methods=["GET", "POST"])
+@login_required
+def change_lang():
+    if request.method == 'GET':
+        return redirect(url_for('.index'))
+    from itupass import SUPPORTED_LANGUAGES
+    _next = request.args.get('next')
+    new_lang = request.form.get('lang', None)
+    if new_lang and new_lang in SUPPORTED_LANGUAGES:
+        current_user.locale = new_lang
+        current_user.save()
+    return redirect(_next or url_for('.index'))
+
+
 @client.route("/logout/", methods=["GET"])
 @login_required
 def logout():

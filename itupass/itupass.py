@@ -1,6 +1,6 @@
 from flask import Flask, g, request
 from flask_babel import Babel
-from flask_login import LoginManager
+from flask_login import LoginManager, current_user
 from flask_wtf.csrf import CSRFProtect
 from flask_gravatar import Gravatar
 import psycopg2
@@ -13,13 +13,14 @@ from itupass import models
 from itupass import views
 
 
-__all__ = ['get_db', 'init_db', 'close_database']
-
-load_dotenv(find_dotenv(), override=True)
-
 SUPPORTED_LANGUAGES = [
     'en', 'tr', 'ru'
 ]
+
+__all__ = ['get_db', 'init_db', 'close_database', 'SUPPORTED_LANGUAGES']
+
+load_dotenv(find_dotenv(), override=True)
+
 DEFAULT_PASSWORDS = {
     'admin@tester.com': 'admin', 'teacher@tester.com': 'teacher', 'tonystark@tester.com': 'tester',
     'elonmusk@tester.com': 'tester', 'mjolnir@tester.com': 'godofthunder',
@@ -157,9 +158,8 @@ def parsedata_command():
 
 @babel.localeselector
 def get_locale():
-    user = getattr(g, 'user', None)
-    if user is not None:
-        return user.locale
+    if current_user.is_authenticated:
+        return current_user.locale
     return request.accept_languages.best_match(SUPPORTED_LANGUAGES)
 
 
@@ -168,4 +168,8 @@ def get_locale():
 def utility_processor():
     def currentlocale():
         return get_locale()
-    return dict(currentlocale=currentlocale)
+
+    def all_locales():
+        return SUPPORTED_LANGUAGES
+
+    return dict(currentlocale=currentlocale, all_locales=all_locales)

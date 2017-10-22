@@ -61,6 +61,15 @@
           <a href="#">FAQ</a>
         </li>
       </ul>
+      <form action="{{ url_for('client.change_lang') }}" method="post" name="switchLanguageForm">
+        <input name="next" type="hidden" value="{{ request.path }}" />
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <select name="lang" onChange="switchLanguageForm.submit();">
+          <option value="en"{% if currentlocale() == "en" %} selected{% endif %}>English</option>
+          <option value="tr"{% if currentlocale() == "tr" %} selected{% endif %}>Türkçe</option>
+          <option value="ru"{% if currentlocale() == "ru" %} selected{% endif %}>Русский</option>
+        </select>
+      </form>
     </div>
   </footer>
 
