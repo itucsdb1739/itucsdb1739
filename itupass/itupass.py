@@ -40,14 +40,6 @@ DEFAULT_BLUEPRINTS = (
     (views.client, ""),
 )
 
-# Login Manager
-login_manager = LoginManager()
-
-
-@login_manager.user_loader
-def load_user(user_id):
-    return models.User.get(user_id)
-
 
 class Config(object):
     DEBUG = True
@@ -88,14 +80,6 @@ def create_app():
     else:
         # Local or unknown environment
         _app.config.from_object(Config)
-    _babel = Babel(_app)
-    # Enable Sentry in production
-    sentry = None
-    if 'SENTRY_DSN' in _app.config:
-        sentry = Sentry(_app, dsn=_app.config['SENTRY_DSN'])
-    login_manager.init_app(_app)
-    # login_manager.login_view = "frontend.login" @TODO
-    CSRFProtect(_app)
     _app.config['gravatar'] = Gravatar(
         _app, size=160, rating='g', default='retro', force_default=False,
         force_lower=False, use_ssl=True, base_url=None
@@ -104,10 +88,24 @@ def create_app():
     for view, url_prefix in DEFAULT_BLUEPRINTS:
         _app.register_blueprint(view, url_prefix=url_prefix)
 
-    return _app, _babel, sentry
+    return _app
 
 
-app, babel, _ = create_app()
+app = create_app()
+babel = Babel(app)
+# Enable Sentry
+if 'SENTRY_DSN' in app.config:
+    sentry = Sentry(app, dsn=app.config['SENTRY_DSN'])
+CSRFProtect(app)
+# Login Manager
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = "client.login"
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return models.User.get(user_id)
 
 
 def _connect_db(_app):
@@ -141,7 +139,7 @@ def init_db(_app):
 def initdb_command():
     """Initialize database tables and initial values."""
     from itupass.models import User
-    _app, _, __ = create_app()
+    _app = create_app()
     init_db(_app)
     for email in DEFAULT_PASSWORDS:
         with User.get(email=email) as user:
