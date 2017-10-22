@@ -144,7 +144,15 @@ def initdb_command():
     for email in DEFAULT_PASSWORDS:
         with User.get(email=email) as user:
             user.set_password(DEFAULT_PASSWORDS[email])
-    print('Initialized the database.')
+    print("Initialized the database.")
+
+
+@app.cli.command('parsedata')
+def parsedata_command():
+    """Parse data from external sources."""
+    from itupass.utils import parse_academic_calendar
+    parse_academic_calendar()
+    print("Data Imported.")
 
 
 @babel.localeselector

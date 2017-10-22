@@ -42,6 +42,7 @@ CREATE TABLE events (
   id        SERIAL PRIMARY KEY,
   summary   VARCHAR(255) NOT NULL,
   date      TIMESTAMP DEFAULT NULL,
+  end_date  TIMESTAMP DEFAULT NULL,
   category  INTEGER REFERENCES event_categories ON DELETE CASCADE,
   url       VARCHAR(255) DEFAULT NULL
 );

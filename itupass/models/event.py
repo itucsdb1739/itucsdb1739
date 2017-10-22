@@ -104,6 +104,7 @@ class EventCategory(object):
             result.append(EventCategory(**category))
         return result
 
+
     def delete(self):
         """Delete current category.
 
@@ -180,11 +181,12 @@ class Event(object):
         ('pk', None),
         ('summary', None),
         ('date', None),
+        ('end_date', None),
         ('category', None),
         ('url', None)
     ])
 
-    def __init__(self, pk=None, summary=None, date=datetime.now(), category=None, url=None):
+    def __init__(self, pk=None, summary=None, date=datetime.now(), end_date=None, category=None, url=None):
         for key in self.columns:
             setattr(self, key, vars().get(key))
 
@@ -266,6 +268,29 @@ class Event(object):
             result.append(Event(**event))
         return result
 
+    @classmethod
+    def get_next_events(cls, category=None, limit=10):
+        today = datetime.now()
+        db = get_database()
+        cursor = db.cursor
+        if category:
+            cursor.execute(
+                "SELECT * FROM {table} WHERE date >= %(date)s AND category = %(category)s LIMIT {limit}".format(
+                    table=cls.Meta.table_name, limit=limit
+                ), {'date': today, 'category': category}
+            )
+        else:
+            cursor.execute(
+                "SELECT * FROM {table} WHERE date >= %(date)s LIMIT {limit}".format(
+                    table=cls.Meta.table_name, limit=limit
+                ), {'date': today}
+            )
+        events = db.fetch_execution(cursor)
+        result = []
+        for event in events:
+            result.append(Event(**event))
+        return result
+
     def delete(self):
         """Delete current event.
 
@@ -310,9 +335,9 @@ class Event(object):
         # new event
         del data['pk']
         query = "INSERT INTO {table} " \
-                "(summary, date, category, url) " \
+                "(summary, date, end_date, category, url) " \
                 "VALUES" \
-                "(%(summary)s, %(date)s, %(category)s, %(url)s) RETURNING id".format(
+                "(%(summary)s, %(date)s, %(end_date)s, %(category)s, %(url)s) RETURNING id".format(
                     table=self.Meta.table_name
                 )
         cursor.execute(query, dict(data))

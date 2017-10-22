@@ -8,5 +8,7 @@ python-dotenv
 python-slugify
 gunicorn
 psycopg2
+requests
+beautifulsoup4==4.6.0
 blinker
 raven
