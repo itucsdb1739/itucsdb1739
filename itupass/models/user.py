@@ -31,10 +31,13 @@ class User(UserMixin):
             # new user
             self.set_password()
 
-    def __repr__(self):
+    def __str__(self):
         if self.name:
             return self.name
         return self.email
+
+    def __repr__(self):
+        return '<User {pk}: {email}>'.format(pk=self.pk, email=self.email)
 
     def set_password(self, password=None):
         """Make password hash."""
@@ -71,7 +74,8 @@ class User(UserMixin):
         cursor = db.cursor
         if pk:
             cursor.execute(
-                "SELECT * FROM {table} WHERE (id={pk})".format(table=cls.Meta.table_name, pk=pk)
+                "SELECT * FROM {table} WHERE (id=%(pk)s)".format(table=cls.Meta.table_name),
+                {'pk': pk}
             )
         elif email:
             cursor.execute(
