@@ -269,7 +269,7 @@ class Event(object):
         return result
 
     @classmethod
-    def get_next_events(cls, category=None, limit=10):
+    def get_next_events(cls, category=None, limit=10, populate_categories=False):
         today = datetime.now()
         db = get_database()
         cursor = db.cursor
@@ -289,6 +289,9 @@ class Event(object):
         result = []
         for event in events:
             result.append(Event(**event))
+        if populate_categories:
+            for event in result:
+                event.category = EventCategory.get(event.category)
         return result
 
     def delete(self):
