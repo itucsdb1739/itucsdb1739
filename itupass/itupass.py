@@ -20,6 +20,11 @@ load_dotenv(find_dotenv(), override=True)
 SUPPORTED_LANGUAGES = [
     'en', 'tr', 'ru'
 ]
+DEFAULT_PASSWORDS = {
+    'admin@tester.com': 'admin', 'teacher@tester.com': 'teacher', 'tonystark@tester.com': 'tester',
+    'elonmusk@tester.com': 'tester', 'mjolnir@tester.com': 'godofthunder',
+    'bruce@tester.com': 'mrgreen'
+}
 
 
 def vcap_to_uri():
@@ -29,6 +34,7 @@ def vcap_to_uri():
         return parsed["elephantsql"][0]["credentials"]["uri"]
     return None
 
+
 DEFAULT_BLUEPRINTS = (
     # Add blueprints here
     (views.client, ""),
@@ -36,6 +42,7 @@ DEFAULT_BLUEPRINTS = (
 
 # Login Manager
 login_manager = LoginManager()
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -49,7 +56,7 @@ class Config(object):
     SECRET_KEY = os.environ.get("SECRET_KEY", "Not#So@Secret")
     WTF_CSRF_SECRET_KEY = os.environ.get("SECRET_KEY", "Not#So@Secret")
     SESSION_COOKIE_NAME = "Ssession"
-    SECURITY_USER_IDENTITY_ATTRIBUTES = ['username', 'email']
+    SECURITY_USER_IDENTITY_ATTRIBUTES = ['email']
     LANGUAGES = SUPPORTED_LANGUAGES
     BABEL_DEFAULT_LOCALE = "en"
     BABEL_DEFAULT_TIMEZONE = "Europe/Istanbul"
@@ -69,61 +76,63 @@ class TravisConfig(Config):
     DEBUG = False
     TESTING = False
 
+
 def create_app():
-    app = Flask('itupass')
+    _app = Flask('itupass')
     if os.environ.get("TravisCI", None):
         # It is Travis-CI test build
-        app.config.from_object(TravisConfig)
+        _app.config.from_object(TravisConfig)
     elif os.environ.get("VCAP_SERVICES", None):
         # IBM Bluemix
-        app.config.from_object(ProductionConfig)
+        _app.config.from_object(ProductionConfig)
     else:
         # Local or unknown environment
-        app.config.from_object(Config)
-    babel = Babel(app)
+        _app.config.from_object(Config)
+    _babel = Babel(_app)
     # Enable Sentry in production
-    if 'SENTRY_DSN' in app.config:
-        sentry = Sentry(app, dsn=app.config['SENTRY_DSN'])
-
-    login_manager.init_app(app)
+    sentry = None
+    if 'SENTRY_DSN' in _app.config:
+        sentry = Sentry(_app, dsn=_app.config['SENTRY_DSN'])
+    login_manager.init_app(_app)
     # login_manager.login_view = "frontend.login" @TODO
-    CSRFProtect(app)
-    app.config['gravatar'] = Gravatar(
-        app, size=160, rating='g', default='retro', force_default=False, force_lower=False, use_ssl=True, base_url=None
+    CSRFProtect(_app)
+    _app.config['gravatar'] = Gravatar(
+        _app, size=160, rating='g', default='retro', force_default=False,
+        force_lower=False, use_ssl=True, base_url=None
     )
     # Set views
     for view, url_prefix in DEFAULT_BLUEPRINTS:
-        app.register_blueprint(view, url_prefix=url_prefix)
+        _app.register_blueprint(view, url_prefix=url_prefix)
 
-    return app, babel
-
-
-app, babel = create_app()
+    return _app, _babel, sentry
 
 
-def _connect_db(app):
-    return models.Database(psycopg2.connect(app.config['DATABASE_URI']))
+app, babel, _ = create_app()
 
 
-def get_db(app):
+def _connect_db(_app):
+    return models.Database(psycopg2.connect(_app.config['DATABASE_URI']))
+
+
+def get_db(_app):
     """Open new database connection if there is none."""
     if not hasattr(g, 'database'):
-        g.database = _connect_db(app)
+        g.database = _connect_db(_app)
     return g.database
 
 
 @app.teardown_appcontext
-def close_database(exception=None):
+def close_database(*_, **__):
     """Closes the database again at the end of the request."""
     if hasattr(g, 'database'):
         g.database.close()
         del g.database
 
 
-def init_db(app):
+def init_db(_app):
     """Initializes the database."""
-    db = get_db(app)
-    with app.open_resource('schema.sql', mode='r') as f:
+    db = get_db(_app)
+    with _app.open_resource('schema.sql', mode='r') as f:
         db.cursor.execute(f.read())
     db.commit()
 
@@ -132,15 +141,11 @@ def init_db(app):
 def initdb_command():
     """Initialize database tables and initial values."""
     from itupass.models import User
-    app, _ = create_app()
-    init_db(app)
-    DEFAULT_PASSWORDS = {
-        'admin': 'admin', 'teacher': 'teacher', 'tonystark': 'tester', 'elonmusk': 'tester',
-        'thor': 'godofthunder', 'banner': 'mrgreen'
-    }
-    for username in DEFAULT_PASSWORDS:
-        with User.get(username=username) as user:
-            user.set_password(DEFAULT_PASSWORDS[username])
+    _app, _, __ = create_app()
+    init_db(_app)
+    for email in DEFAULT_PASSWORDS:
+        with User.get(email=email) as user:
+            user.set_password(DEFAULT_PASSWORDS[email])
     print('Initialized the database.')
 
 
@@ -150,6 +155,7 @@ def get_locale():
     if user is not None:
         return user.locale
     return request.accept_languages.best_match(SUPPORTED_LANGUAGES)
+
 
 # Template contexts
 @app.context_processor

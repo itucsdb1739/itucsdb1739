@@ -69,5 +69,8 @@ venv/
 # mkdocs documentation
 /site
 
+# Intellij
+.idea/
+
 # SQLite:
 test.db

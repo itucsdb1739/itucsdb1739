@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% from "helpers/formhelpers.html" import render_field %}
+{% block title %}{% trans %}Registration{% endtrans %}{% endblock %}
+{% block content %}
+<section class="features text-center" id="registration">
+  <div class="container">
+    <div class="section-heading text-center">
+      <h2>{% trans %}Registration{% endtrans %}</h2>
+      {% if errors %}<p class="error-message">{{ errors }}</p>{% endif %}
+    </div>
+    <div class="row">
+      <div class="col-md-5 col-centered">
+        <form method=post action="{{ url_for('.register') }}?next={{ request.args.get('next', '/') }}">
+          <fieldset>
+            {% for field in form %}
+              {{ render_field(field) }}
+            {% endfor %}
+            <div class="form-group">
+              <input
+                name="is_teacher" type="checkbox" id="student-switch" data-on-text="{% trans %}Teacher{% endtrans %}"
+                data-off-text="{% trans %}Student{% endtrans %}"
+              >
+            </div>
+            <div class="form-group">
+              <button type="submit" class="btn btn-primary">{% trans %}Register{% endtrans %}</button>
+            </div>
+          </fieldset>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block extracss %}
+<link href="{{ url_for('static', filename='css/bootstrap-switch.min.css') }}" rel="stylesheet">
+{% endblock %}
+{% block extrajs %}
+<script src="{{ url_for('static', filename='js/bootstrap-switch.min.js') }}"></script>
+<script>
+$(document).ready(function() {
+  $('#student-switch').bootstrapSwitch();
+});
+</script>
+{% endblock %}
