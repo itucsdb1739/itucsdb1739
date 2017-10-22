@@ -10,6 +10,7 @@
   <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
   <link href="{{ url_for('static', filename='css/font-awesome.min.css') }}" rel="stylesheet">
   <link href="{{ url_for('static', filename='css/new-age.css') }}" rel="stylesheet">
+  {% block extracss %}{% endblock %}
   <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet">
   <!-- /CSS -->
 </head>
@@ -69,6 +70,8 @@
   <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
   <script src="{{ url_for('static', filename='js/jquery.easing.min.js') }}"></script>
   <script src="{{ url_for('static', filename='js/new-age.min.js') }}"></script>
+  {% block extrajs %}{% endblock %}
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
   <!-- /JS -->
 </body>
 </html>

@@ -7,17 +7,10 @@ from wtforms.validators import DataRequired, EqualTo, Length, Email, ValidationE
 
 class UserForm(FlaskForm):
     """Registration form for user."""
-    username = StringField(
-        _("Username"), validators=[DataRequired(), Length(min=4, max=49)],
-        render_kw={
-            "placeholder": _("Username"),
-            "class": "form-control"
-        }
-    )
     email = EmailField(
         _("Email"), validators=[DataRequired(), Email()],
         render_kw={
-            "placeholder": _("@itu.edu.tr"),
+            "placeholder": _("Email: @itu.edu.tr"),
             "class": "form-control"
         }
     )
@@ -42,24 +35,19 @@ class UserForm(FlaskForm):
             "class": "form-control"
         }
     )
-    is_teacher = SelectField(
-        _("Role"), choices=[(False, _("Student")), (True, _("Teacher"))],
-        render_kw={
-            "class": "select2"
-        }
-    )
 
-    def validate_email(form, field):
+    def validate_email(self, field):
+        """Check for university email domain."""
         if '@itu.edu.tr' not in field.data:
             raise ValidationError(_("Sorry, you can only register using ITU email address."))
 
 
 class LoginForm(FlaskForm):
     """Form for user login."""
-    username = StringField(
-        _("Username"), validators=[DataRequired(), Length(min=4, max=49)],
+    email = StringField(
+        _("Email"), validators=[DataRequired(), Length(min=4, max=49)],
         render_kw={
-            "placeholder": _("Username"),
+            "placeholder": _("E-mail"),
             "class": "form-control"
         }
     )

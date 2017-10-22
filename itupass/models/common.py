@@ -1,10 +1,11 @@
 """Database Model."""
 
+
 class Database(object):
     def __init__(self, connection, database="postgresql"):
         self.connection = connection
         if database == "postgresql":
-            self.connection.set_session(autocommit=True)
+            self.connection.set_session(autocommit=False)
 
     @property
     def cursor(self):
@@ -13,8 +14,6 @@ class Database(object):
 
     def set(self, connection=None):
         self.connection = connection
-        if self.connection:
-            self.cursor = connection.cursor()
 
     def commit(self):
         self.connection.commit()
@@ -48,6 +47,7 @@ class Database(object):
 
         Imported from dbConnect Module, https://github.com/mastizada/dbConnect/, MPLv2
         Read https://dbconnect.readthedocs.io for more details
+        :param case: Use AND or OR cases for filters
         :param filters: dict filters for rows (where)
         :return: str update query and dict where data
         """

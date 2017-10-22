@@ -13,7 +13,6 @@ class User(UserMixin):
     """User Model."""
     columns = OrderedDict([
         ('pk', None),
-        ('username', None),
         ('password', None),
         ('email', None),
         ('name', None),
@@ -24,7 +23,7 @@ class User(UserMixin):
         ('is_staff', False)
     ])
 
-    def __init__(self, pk=None, username=None, password=None, email=None, name=None,
+    def __init__(self, pk=None, password=None, email=None, name=None,
                  locale='en', confirmed_at=None, deleted=False, is_teacher=False, is_staff=False):
         for key in self.columns:
             setattr(self, key, vars().get(key))
@@ -35,7 +34,7 @@ class User(UserMixin):
     def __repr__(self):
         if self.name:
             return self.name
-        return self.username
+        return self.email
 
     def set_password(self, password=None):
         """Make password hash."""
@@ -62,7 +61,7 @@ class User(UserMixin):
         return str(self.pk)
 
     @classmethod
-    def get(cls, pk=None, username=None, email=None):
+    def get(cls, pk=None, email=None):
         """Get user using identifier.
 
         :example: User.get(user_id); User.get(email="some@domain.network")
@@ -73,11 +72,6 @@ class User(UserMixin):
         if pk:
             cursor.execute(
                 "SELECT * FROM {table} WHERE (id={pk})".format(table=cls.Meta.table_name, pk=pk)
-            )
-        elif username:
-            cursor.execute(
-                "SELECT * FROM {table} WHERE (username=%(username)s)".format(table=cls.Meta.table_name),
-                {'username': username}
             )
         elif email:
             cursor.execute(
@@ -150,7 +144,7 @@ class User(UserMixin):
         db = get_database()
         cursor = db.cursor
         data = self.get_values()
-        user = self.get(username=self.username)
+        user = self.get(email=self.email)
         if user:
             # update old user
             old_data = user.get_values()
@@ -175,13 +169,13 @@ class User(UserMixin):
         # new user
         del data['pk']
         query = "INSERT INTO {table} " \
-                "(username, email, name, locale, confirmed_at, is_teacher, is_staff, password) " \
+                "(email, name, locale, confirmed_at, is_teacher, is_staff, password) " \
                 "VALUES" \
-                "(%(username)s, %(email)s, %(name)s, %(locale)s, %(confirmed_at)s, %(is_teacher)s, " \
+                "(%(email)s, %(name)s, %(locale)s, %(confirmed_at)s, %(is_teacher)s, " \
                 "%(is_staff)s, %(password)s)".format(table=self.Meta.table_name)
         cursor.execute(query, dict(data))
         db.commit()
-        return self.get(username=self.username)
+        return self.get(email=self.email)
 
     def __enter__(self):
         return self
