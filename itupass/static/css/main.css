@@ -4,13 +4,17 @@ section.features .icon-red i {
 section.features .icon-black i {
   background-image: linear-gradient(to left, #121213, #000000);
 }
-section.features .icon-blue i {
-  background-image: linear-gradient(to left, #121213, #0000ff);
+section.features .icon-orange i {
+  background-image: linear-gradient(#e66000, #e66000);
 }
-.bg-grey {
-  background: #42d738;
-  background: -webkit-linear-gradient(#fdc539, #42d738);
-  background: linear-gradient(#fdc539, #42d738);
+.icon-orange .text-muted {
+  color: #ffffff !important;
+}
+.bg-blue {
+  background: #0066ff;
+  background: -webkit-linear-gradient(#0066ff, #222222);
+  background: linear-gradient(#0066ff, #222222);
+  color: #eeeeee;
 }
 section.contact ul.list-social li.social-github a {
   background-color: #333333;

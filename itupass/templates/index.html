@@ -24,7 +24,7 @@
 </header>
 {% endblock %}
 {% block content %}
-<section class="features bg-primary text-center" id="features">
+<section class="features text-center" id="features">
   <div class="container">
     <div class="section-heading text-center">
       <h2>{% trans %}Everything for Success{% endtrans %}</h2>
@@ -39,21 +39,21 @@
         </div>
       </div>
       <div class="col-lg-3 my-auto">
-        <div class="feature-item icon-blue">
+        <div class="feature-item">
           <i class="fa fa-comments text-primary"></i>
           <h3>{% trans %}Discussions{% endtrans %}</h3>
           <p class="text-muted">{% trans %}Discuss in chat groups for lectures and projects or with induviduals such as students and teachers{% endtrans %}</p>
         </div>
       </div>
       <div class="col-lg-3 my-auto">
-        <div class="feature-item icon-red">
+        <div class="feature-item">
           <i class="fa fa-calendar text-primary"></i>
           <h3>{% trans %}Schedule{% endtrans %}</h3>
           <p class="text-muted">{% trans %}Automatically generates university schedule which can be exported to any calendar application using iCal format{% endtrans %}</p>
         </div>
       </div>
       <div class="col-lg-3 my-auto">
-        <div class="feature-item icon-black">
+        <div class="feature-item">
           <i class="fa fa-users text-primary"></i>
           <h3>{% trans %}Project Groups{% endtrans %}</h3>
           <p class="text-muted">{% trans %}Join to project groups and coordinate term projects together{% endtrans %}</p>
@@ -62,7 +62,7 @@
     </div>
   </div>
 </section>
-<section class="features bg-grey text-center" id="news">
+<section class="features bg-blue text-center" id="news">
   <div class="container">
     <div class="section-heading text-center">
       <h2>{% trans %}News{% endtrans %}</h2>
@@ -71,7 +71,7 @@
     <div class="row">
       {% for event in events %}
       <div class="col-lg-3 my-auto">
-        <div class="feature-item icon-blue">
+        <div class="feature-item icon-orange">
           {% if event.category.slug == "academic-calendar" %}
           <i class="fa fa-graduation-cap text-primary"></i>
           {% elif event.category.slug == "cs-news" or event.category.slug == "cs-events" %}
