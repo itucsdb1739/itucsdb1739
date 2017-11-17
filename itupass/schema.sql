@@ -1,9 +1,15 @@
+DROP TABLE IF EXISTS departments CASCADE;
+CREATE TABLE departments (
+  code          VARCHAR(5) PRIMARY KEY,
+  name          VARCHAR(255)
+);
 DROP TABLE IF EXISTS users CASCADE;
 CREATE TABLE users (
   id            SERIAL PRIMARY KEY,
   password      VARCHAR(255),
   email         VARCHAR(100) UNIQUE,
   name          VARCHAR(200),
+  department    VARCHAR(5) REFERENCES departments ON DELETE SET NULL DEFAULT NULL,
   locale        VARCHAR(6),
   confirmed_at  TIMESTAMP DEFAULT NULL,
   deleted       BOOLEAN   DEFAULT FALSE,

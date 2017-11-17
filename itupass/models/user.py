@@ -16,6 +16,7 @@ class User(UserMixin):
         ('password', None),
         ('email', None),
         ('name', None),
+        ('department', None),
         ('locale', 'en'),
         ('confirmed_at', None),
         ('deleted', False),
@@ -23,7 +24,7 @@ class User(UserMixin):
         ('is_staff', False)
     ])
 
-    def __init__(self, pk=None, password=None, email=None, name=None,
+    def __init__(self, pk=None, password=None, email=None, name=None, department=None,
                  locale='en', confirmed_at=None, deleted=False, is_teacher=False, is_staff=False):
         for key in self.columns:
             setattr(self, key, vars().get(key))
@@ -173,9 +174,9 @@ class User(UserMixin):
         # new user
         del data['pk']
         query = "INSERT INTO {table} " \
-                "(email, name, locale, confirmed_at, is_teacher, is_staff, password) " \
+                "(email, name, department, locale, confirmed_at, is_teacher, is_staff, password) " \
                 "VALUES" \
-                "(%(email)s, %(name)s, %(locale)s, %(confirmed_at)s, %(is_teacher)s, " \
+                "(%(email)s, %(name)s, %(department)s, %(locale)s, %(confirmed_at)s, %(is_teacher)s, " \
                 "%(is_staff)s, %(password)s)".format(table=self.Meta.table_name)
         cursor.execute(query, dict(data))
         db.commit()
