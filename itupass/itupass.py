@@ -21,11 +21,9 @@ __all__ = ['get_db', 'init_db', 'close_database', 'SUPPORTED_LANGUAGES']
 
 load_dotenv(find_dotenv(), override=True)
 
-DEFAULT_PASSWORDS = {
-    'admin@tester.com': 'admin', 'teacher@tester.com': 'teacher', 'tonystark@tester.com': 'tester',
-    'elonmusk@tester.com': 'tester', 'mjolnir@tester.com': 'godofthunder',
-    'bruce@tester.com': 'mrgreen'
-}
+DEFAULT_PASSWORDS = json.load(open('data/users.json'))
+# @TODO Source: http://www.sis.itu.edu.tr/tr/sistem/fak_bol_kodlari.html
+DEFAULT_DEPARTMENTS = json.load(open('data/departments.json'))
 
 
 def vcap_to_uri():
@@ -139,12 +137,14 @@ def init_db(_app):
 @app.cli.command('initdb')
 def initdb_command():
     """Initialize database tables and initial values."""
-    from itupass.models import User
+    from itupass.models import User, Department
     _app = create_app()
     init_db(_app)
     for email in DEFAULT_PASSWORDS:
         with User.get(email=email) as user:
             user.set_password(DEFAULT_PASSWORDS[email])
+    for code in DEFAULT_DEPARTMENTS:
+        Department(code=code, name=DEFAULT_DEPARTMENTS[code]).save()
     print("Initialized the database.")
 
 
