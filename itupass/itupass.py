@@ -140,11 +140,12 @@ def initdb_command():
     from itupass.models import User, Department
     _app = create_app()
     init_db(_app)
-    for email in DEFAULT_PASSWORDS:
-        with User.get(email=email) as user:
-            user.set_password(DEFAULT_PASSWORDS[email])
     for code in DEFAULT_DEPARTMENTS:
         Department(code=code, name=DEFAULT_DEPARTMENTS[code]).save()
+    for email in DEFAULT_PASSWORDS:
+        with User.get(email=email) as user:
+            user.department = "BLGE"
+            user.set_password(DEFAULT_PASSWORDS[email])
     print("Initialized the database.")
 
 
