@@ -11,6 +11,7 @@ class Department(object):
         ('code', None),  # BLG, BLGE, TEL
         ('name', None)
     ])
+
     def __init__(self, code=None, name=None):
         for key in self.columns:
             setattr(self, key, vars().get(key))
@@ -94,7 +95,7 @@ class Department(object):
         return result
 
     def delete(self):
-        """Delete current event.
+        """Delete current department.
 
         :Example: department.delete()
         """
@@ -114,7 +115,7 @@ class Department(object):
         if self.code:
             department = self.get(code=self.code)
         if department:
-            # update old event
+            # update old department
             old_data = department.get_values()
             diffkeys = [key for key in data if data[key] != old_data[key]]
             if not diffkeys:
@@ -132,9 +133,9 @@ class Department(object):
             query += "WHERE code={code}".format(code=department.code)
             cursor.execute(query, filters)
             db.commit()
-            # Return saved event
+            # Return saved department
             return self.get(code=department.code)
-        # new event
+        # new department
         query = "INSERT INTO {table} " \
                 "(code, name) " \
                 "VALUES" \

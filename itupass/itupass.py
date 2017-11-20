@@ -157,6 +157,12 @@ def parsedata_command():
     print("Data Imported.")
 
 
+@app.cli.command('parse-lectures')
+def parse_lectures_command():
+    """Parse lectures for current departments."""
+    print("Lectures Imported.")
+
+
 @babel.localeselector
 def get_locale():
     if current_user.is_authenticated:
