@@ -45,6 +45,17 @@ CREATE TABLE lecture_departments (
   PRIMARY KEY (lecture, department)
 );
 
+DROP TABLE IF EXISTS lecture_schedule;
+CREATE TABLE lecture_schedule (
+  id            SERIAL PRIMARY KEY,
+  lecture       INTEGER REFERENCES lectures ON DELETE CASCADE,
+  building      VARCHAR(10),
+  room          VARCHAR(50),
+  day_of_week   INTEGER,
+  start_time    TIME default NULL,
+  end_time      TIME default NULL
+);
+
 DROP TABLE IF EXISTS events;
 DROP TABLE IF EXISTS event_categories CASCADE;
 CREATE TABLE event_categories (

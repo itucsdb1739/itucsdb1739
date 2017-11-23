@@ -68,6 +68,11 @@ class Lecture(object):
         db.commit()
         return True
 
+    def get_schedules(self):
+        if not self.pk:
+            return None
+        return LectureSchedule.filter(lecture=self.pk)
+
     @classmethod
     def get(cls, pk=None):
         """Get lecture using identifier.
@@ -213,3 +218,184 @@ class Lecture(object):
 
     class Meta:
         table_name = 'lectures'
+
+
+class LectureSchedule(object):
+    columns = OrderedDict([
+        ('pk', None),
+        ('lecture', None),
+        ('building', None),
+        ('room', None),
+        ('day_of_week', None),
+        ('start_time', None),
+        ('end_time', None)
+    ])
+
+    WEEK_DAYS = {
+        'Pazartesi': 1,
+        'Salı': 2,
+        'Çarşamba': 3,
+        'Perşembe': 4,
+        'Cuma': 5,
+        'Cumartesi': 6,
+        'Pazar': 7
+    }
+
+    def __init__(self, pk=None, lecture=None, building=None, room=None, day_of_week=None,
+                start_time=None, end_time=None):
+        # Convert day_of_week to integer value
+        if day_of_week is not None:
+            if isinstance(day_of_week, str):
+                if day_of_week in self.WEEK_DAYS:
+                    day_of_week = self.WEEK_DAYS[day_of_week]
+                else:
+                    day_of_week = None
+            elif isinstance(day_of_week, int):
+                if day_of_week < 1 or day_of_week > 7:
+                    day_of_week = None
+            else:
+                day_of_week = None
+        # set default values
+        for key in self.columns:
+            setattr(self, key, vars().get(key))
+
+    def __str__(self):
+        return "Schedule on {start} for lecture {lecture}".format(start=self.start_time, lecture=self.lecture)
+
+    def __repr__(self):
+        return '<LectureSchedule {pk}: {lecture}>'.format(pk=self.pk, lecture=self.lecture)
+
+    def get_values(self):
+        """Get values of object as dict object."""
+        values = self.columns.copy()
+        for key in self.columns:
+            values[key] = getattr(self, key)
+        return values
+
+    def get_id(self):
+        return str(self.pk)
+
+    def get_lecture(self):
+        if not self.lecture:
+            return None
+        return Lecture.get(pk=self.lecture)
+
+    @classmethod
+    def get(cls, pk=None):
+        """Get lecture schedule using identifier.
+
+        :example: LectureSchedule.get(lecture_id)
+        :rtype: LectureSchedule or None
+        """
+        db = get_database()
+        cursor = db.cursor
+        if pk:
+            cursor.execute(
+                "SELECT * FROM {table} WHERE (id=%(pk)s)".format(table=cls.Meta.table_name),
+                {'pk': pk}
+            )
+        else:
+            # @TODO raise exception, not enough arguments!
+            return None
+        lecture_schedule = db.fetch_execution(cursor)
+        if lecture_schedule:
+            return LectureSchedule(**lecture_schedule[0])
+        return None
+
+    @classmethod
+    def filter(cls, limit=10, order="id DESC", **kwargs):
+        """Filter lecture schedules.
+
+        :Example: LectureSchedule.filter(lecture=<pk>)
+        :rtype: list
+        """
+        query_order = None
+        query_limit = None
+        db = get_database()
+        cursor = db.cursor
+        filter_data = {}
+        # Delete non-filter data
+        if limit:
+            query_limit = limit
+            del limit
+        if order:
+            query_order = order
+            del order
+        # Select statement for query
+        query = "SELECT * FROM " + cls.Meta.table_name
+        # Add filters
+        if kwargs:
+            filter_query, filter_data = db.where_builder(kwargs)
+            query += " WHERE " + filter_query
+        # Add order and limit if set
+        if query_order:
+            query += " ORDER BY " + query_order
+        if 'ASC' not in query_order and 'DESC' not in query_order:
+            query += " DESC"
+        if query_limit:
+            query += " LIMIT " + str(query_limit)
+        # Execute query and return result
+        cursor.execute(query, filter_data)
+        schedules = db.fetch_execution(cursor)
+        result = []
+        for schedule in schedules:
+            result.append(LectureSchedule(**schedule))
+        return result
+
+    def delete(self):
+        """Delete current lecture schedule.
+
+        :Example: lecture_schedule.delete()
+        """
+        if not self.pk:
+            raise ValueError("Lecture Schedule is not saved yet.")
+        db = get_database()
+        cursor = db.cursor
+        query = "DELETE FROM {table} WHERE id=%(pk)s".format(table=self.Meta.table_name)
+        cursor.execute(query, {'pk': self.pk})
+        db.commit()
+
+    def save(self):
+        db = get_database()
+        cursor = db.cursor
+        data = self.get_values()
+        schedule = None
+        if self.pk:
+            schedule = self.get(pk=self.pk)
+        if schedule:
+            # update old lecture schedule
+            old_data = schedule.get_values()
+            diffkeys = [key for key in data if data[key] != old_data[key]]
+            if not diffkeys:
+                # Nothing changed
+                return schedule
+            filters = {}
+            for key in diffkeys:
+                filters[key] = self.get_values()[key]
+            query = "UPDATE {table} SET ".format(table=self.Meta.table_name)
+            for key in filters:
+                query += key + ' = %(' + key + ')s, '
+            # Remove last comma
+            query = query.rstrip(', ') + ' '
+            # Add filter
+            query += "WHERE id={pk}".format(pk=schedule.pk)
+            cursor.execute(query, filters)
+            db.commit()
+            # Return saved schedule
+            return self.get(pk=schedule.pk)
+        # new lecture
+        del data['pk']
+        query = "INSERT INTO {table} " \
+                "(lecture, building, room, day_of_week, start_time, end_time) " \
+                "VALUES" \
+                "(%(lecture)s, %(building)s, %(room)s, %(day_of_week)s, %(start_time)s, " \
+                "%(end_time)s) RETURNING id".format(
+                    table=self.Meta.table_name
+                )
+        cursor.execute(query, dict(data))
+        db.commit()
+        new_row_pk = cursor.fetchone()[0]
+        return self.get(pk=new_row_pk)
+
+    class Meta:
+        table_name = 'lecture_schedule'

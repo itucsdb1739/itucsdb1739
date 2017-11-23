@@ -160,7 +160,9 @@ def parsedata_command():
 @app.cli.command('parse-lectures')
 def parse_lectures_command():
     """Parse lectures for current departments."""
-    print("Lectures Imported.")
+    from itupass.utils import parse_lectures_data
+    parse_lectures_data()
+    print("Lectures imported.")
 
 
 @babel.localeselector
