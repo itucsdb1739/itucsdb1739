@@ -52,6 +52,8 @@ def parse_lectures_data():
                     year=current_year
                 )
                 new_lecture = new_lecture.save()
+                for dep in lecture_deps:
+                    new_lecture.add_department(dep)
                 db_lecture.append(new_lecture)
             # Check for lecture schedules
             db_lecture = db_lecture[0]
