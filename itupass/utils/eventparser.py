@@ -75,6 +75,7 @@ def parse_academic_calendar():
             start_datetime = datetime(day=int(day), month=MONTH[month], year=int(year))
         else:
             # @TODO log warning
+            print("[ERROR] Date parsing: {date}".format(date=page_date))
             continue
         if not Event.filter(summary=summary, date=start_datetime):
             new_event = Event(summary=summary, date=start_datetime, end_date=end_datetime, category=category.pk)

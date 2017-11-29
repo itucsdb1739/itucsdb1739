@@ -3,6 +3,7 @@ CREATE TABLE departments (
   code          VARCHAR(5) PRIMARY KEY,
   name          VARCHAR(255)
 );
+
 DROP TABLE IF EXISTS users CASCADE;
 CREATE TABLE users (
   id            SERIAL PRIMARY KEY,
@@ -27,8 +28,36 @@ INSERT INTO users (
   ('mjolnir@tester.com', 'Thor Odinson', FALSE, FALSE),
   ('bruce@tester.com', 'Bruce Banner', TRUE, FALSE);
 
-DROP TABLE IF EXISTS events CASCADE;
-DROP TABLE IF EXISTS event_categories;
+DROP TABLE IF EXISTS lectures CASCADE;
+CREATE TABLE lectures (
+  id              SERIAL PRIMARY KEY,
+  crn             INTEGER,
+  code            VARCHAR(10),
+  name            VARCHAR(255),
+  instructor      VARCHAR(255) DEFAULT NULL,
+  year            INTEGER
+);
+
+DROP TABLE IF EXISTS lecture_departments;
+CREATE TABLE lecture_departments (
+  lecture       INTEGER REFERENCES lectures ON DELETE CASCADE,
+  department    VARCHAR(5) REFERENCES departments ON DELETE CASCADE,
+  PRIMARY KEY (lecture, department)
+);
+
+DROP TABLE IF EXISTS lecture_schedule;
+CREATE TABLE lecture_schedule (
+  id            SERIAL PRIMARY KEY,
+  lecture       INTEGER REFERENCES lectures ON DELETE CASCADE,
+  building      VARCHAR(10),
+  room          VARCHAR(50),
+  day_of_week   INTEGER,
+  start_time    TIME default NULL,
+  end_time      TIME default NULL
+);
+
+DROP TABLE IF EXISTS events;
+DROP TABLE IF EXISTS event_categories CASCADE;
 CREATE TABLE event_categories (
   id        SERIAL PRIMARY KEY,
   slug      VARCHAR(200) UNIQUE,
