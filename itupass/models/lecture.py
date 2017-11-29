@@ -68,6 +68,17 @@ class Lecture(object):
         db.commit()
         return True
 
+    @classmethod
+    def count(cls):
+        """Get total number of lectures."""
+        db = get_database()
+        cursor = db.cursor
+        cursor.execute("SELECT count(id) FROM {table}".format(table=cls.Meta.table_name))
+        result = cursor.fetchall()
+        if result:
+            return result[0][0]
+        return None
+
     def get_schedules(self):
         if not self.pk:
             return None
