@@ -69,11 +69,17 @@ class Lecture(object):
         return True
 
     @classmethod
-    def count(cls):
+    def count(cls, **kwargs):
         """Get total number of lectures."""
         db = get_database()
+        filter_data = {}
+        query = "SELECT count(id) FROM {table}".format(table=cls.Meta.table_name)
+        # Add filters
+        if kwargs:
+            filter_query, filter_data = db.where_builder(kwargs)
+            query += " WHERE " + filter_query
         cursor = db.cursor
-        cursor.execute("SELECT count(id) FROM {table}".format(table=cls.Meta.table_name))
+        cursor.execute(query, filter_data)
         result = cursor.fetchall()
         if result:
             return result[0][0]
