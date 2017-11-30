@@ -3,6 +3,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SelectField
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired, EqualTo, Length, Email, ValidationError
+from itupass.models import User
 
 
 class UserForm(FlaskForm):
@@ -40,6 +41,8 @@ class UserForm(FlaskForm):
         """Check for university email domain."""
         if '@itu.edu.tr' not in field.data:
             raise ValidationError(_("Sorry, you can only register using ITU email address."))
+        if User.get(email=field.data):
+            raise ValidationError(_("Sorry, user with this email address is already registered."))
 
 
 class LoginForm(FlaskForm):
