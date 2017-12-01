@@ -113,7 +113,7 @@ class Lecture(object):
         return None
 
     @classmethod
-    def filter(cls, limit=10, order="id DESC", **kwargs):
+    def filter(cls, limit=10, offset=0, order="id DESC", **kwargs):
         """Filter lectures.
 
         :Example: Lecture.filter(year=2017, limit=10)
@@ -121,6 +121,7 @@ class Lecture(object):
         """
         query_order = None
         query_limit = None
+        query_offset = None
         db = get_database()
         cursor = db.cursor
         filter_data = {}
@@ -131,6 +132,9 @@ class Lecture(object):
         if order:
             query_order = order
             del order
+        if offset:
+            query_offset = offset
+            del offset
         # Select statement for query
         query = "SELECT * FROM " + cls.Meta.table_name
         # Add filters
@@ -144,6 +148,8 @@ class Lecture(object):
             query += " DESC"
         if query_limit:
             query += " LIMIT " + str(query_limit)
+        if query_offset:
+            query += " OFFSET " + str(query_offset)
         # Execute query and return result
         cursor.execute(query, filter_data)
         lectures = db.fetch_execution(cursor)
@@ -153,26 +159,31 @@ class Lecture(object):
         return result
 
     @classmethod
-    def filter_wild(cls, code=None, name=None, limit=10):
+    def filter_wild(cls, code=None, name=None, limit=10, offset=0):
         """Wildcard search for code."""
+        query_limit = None
+        query_offset = None
+        if limit:
+            query_limit = limit
+            del limit
+        if offset:
+            query_offset = offset
+            del offset
         db = get_database()
         cursor = db.cursor
         if code:
             code = "%{code}%".format(code=code)
-            cursor.execute(
-                "SELECT * FROM {table} WHERE code LIKE %(code)s LIMIT {limit}".format(
-                    table=cls.Meta.table_name, limit=limit
-                ), {'code': code}
-            )
+            query = "SELECT * FROM {table} WHERE code LIKE %(code)s".format(table=cls.Meta.table_name)
         elif name:
             name = "%{name}%".format(name=name)
-            cursor.execute(
-                "SELECT * FROM {table} WHERE name LIKE %(name)s LIMIT {limit}".format(
-                    table=cls.Meta.table_name, limit=limit
-                ), {'name': name}
-            )
+            query = "SELECT * FROM {table} WHERE name LIKE %(name)s".format(table=cls.Meta.table_name)
         else:
             return None
+        if query_limit:
+            query += " LIMIT " + str(query_limit)
+        if query_offset:
+            query += " OFFSET " + str(query_offset)
+        cursor.execute(query, {'code': code, 'name': name})
         lectures = db.fetch_execution(cursor)
         result = []
         for lecture in lectures:
@@ -320,7 +331,7 @@ class LectureSchedule(object):
         return None
 
     @classmethod
-    def filter(cls, limit=10, order="id DESC", **kwargs):
+    def filter(cls, limit=10, offset=0, order="id DESC", **kwargs):
         """Filter lecture schedules.
 
         :Example: LectureSchedule.filter(lecture=<pk>)
@@ -328,6 +339,7 @@ class LectureSchedule(object):
         """
         query_order = None
         query_limit = None
+        query_offset = None
         db = get_database()
         cursor = db.cursor
         filter_data = {}
@@ -338,6 +350,9 @@ class LectureSchedule(object):
         if order:
             query_order = order
             del order
+        if offset:
+            query_offset = offset
+            del offset
         # Select statement for query
         query = "SELECT * FROM " + cls.Meta.table_name
         # Add filters
@@ -351,6 +366,8 @@ class LectureSchedule(object):
             query += " DESC"
         if query_limit:
             query += " LIMIT " + str(query_limit)
+        if query_offset:
+            query += " OFFSET " + str(query_offset)
         # Execute query and return result
         cursor.execute(query, filter_data)
         schedules = db.fetch_execution(cursor)

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}{% trans %}Administration{% endtrans %}{% endblock %}
+{% block header %}{% endblock %}
+{% block content %}
+<section class="features text-center" id="admintools">
+  <div class="container">
+    <div class="section-heading text-center">
+      <h2>{% trans %}CRUD Models{% endtrans %}</h2>
+      <p>Manage models for website.</p>
+    </div>
+    <div class="row">
+      <div class="col-lg-3 my-auto">
+        <div class="feature-item">
+          <i class="fa fa-users text-primary"></i>
+          <h3><a href="{{ url_for('admin.users_admin') }}">{% trans %}Users ({{ users_count }}){% endtrans %}</a></h3>
+          <p class="text-muted">{% trans %}Active users registered in system.{% endtrans %}</p>
+        </div>
+      </div>
+      <div class="col-lg-3 my-auto">
+        <div class="feature-item">
+          <i class="fa fa-book text-primary"></i>
+          <h3><a href="#">{% trans %}Lectures ({{ lectures_count }}){% endtrans %}</a></h3>
+          <p class="text-muted">{% trans %}Lectures of this year with their schedules.{% endtrans %}</p>
+        </div>
+      </div>
+      <div class="col-lg-3 my-auto">
+        <div class="feature-item">
+          <i class="fa fa-building-o text-primary"></i>
+          <h3><a href="#">{% trans %}Departments ({{ departments_count }}){% endtrans %}</a></h3>
+          <p class="text-muted">{% trans %}Manage university departments.{% endtrans %}</p>
+        </div>
+      </div>
+      <div class="col-lg-3 my-auto">
+        <div class="feature-item">
+          <i class="fa fa-sitemap text-primary"></i>
+          <h3><a href="#">{% trans %}Event Categories ({{ event_cats_count }}){% endtrans %}</a></h3>
+          <p class="text-muted">{% trans %}Manage categories for events.{% endtrans %}</p>
+        </div>
+      </div>
+      <div class="col-lg-3 my-auto">
+        <div class="feature-item">
+          <i class="fa fa-calendar text-primary"></i>
+          <h3><a href="#">{% trans %}Events ({{ events_count }}){% endtrans %}</a></h3>
+          <p class="text-muted">{% trans %}Academic and department related events.{% endtrans %}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

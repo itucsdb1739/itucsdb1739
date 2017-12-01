@@ -38,6 +38,23 @@ class EventCategory(object):
         return str(self.pk)
 
     @classmethod
+    def count(cls, **kwargs):
+        """Get total number of users."""
+        db = get_database()
+        filter_data = {}
+        query = "SELECT count(id) FROM {table}".format(table=cls.Meta.table_name)
+        # Add filters
+        if kwargs:
+            filter_query, filter_data = db.where_builder(kwargs)
+            query += " WHERE " + filter_query
+        cursor = db.cursor
+        cursor.execute(query, filter_data)
+        result = cursor.fetchall()
+        if result:
+            return result[0][0]
+        return None
+
+    @classmethod
     def get(cls, pk=None, slug=None):
         """Get category using identifier.
 
@@ -65,7 +82,7 @@ class EventCategory(object):
         return None
 
     @classmethod
-    def filter(cls, limit=10, order="id DESC", **kwargs):
+    def filter(cls, limit=10, offset=0, order="id DESC", **kwargs):
         """Filter categories.
 
         :Example: EventCategory.filter(name='Test Category', limit=10)
@@ -73,6 +90,7 @@ class EventCategory(object):
         """
         query_order = None
         query_limit = None
+        query_offset = None
         db = get_database()
         cursor = db.cursor
         filter_data = {}
@@ -83,6 +101,9 @@ class EventCategory(object):
         if order:
             query_order = order
             del order
+        if offset:
+            query_offset = offset
+            del offset
         # Select statement for query
         query = "SELECT * FROM " + cls.Meta.table_name
         # Add filters
@@ -96,6 +117,8 @@ class EventCategory(object):
             query += " DESC"
         if query_limit:
             query += " LIMIT " + str(query_limit)
+        if query_offset:
+            query += " OFFSET " + str(query_offset)
         # Execute query and return result
         cursor.execute(query, filter_data)
         categories = db.fetch_execution(cursor)
@@ -207,6 +230,23 @@ class Event(object):
         return str(self.pk)
 
     @classmethod
+    def count(cls, **kwargs):
+        """Get total number of users."""
+        db = get_database()
+        filter_data = {}
+        query = "SELECT count(id) FROM {table}".format(table=cls.Meta.table_name)
+        # Add filters
+        if kwargs:
+            filter_query, filter_data = db.where_builder(kwargs)
+            query += " WHERE " + filter_query
+        cursor = db.cursor
+        cursor.execute(query, filter_data)
+        result = cursor.fetchall()
+        if result:
+            return result[0][0]
+        return None
+
+    @classmethod
     def get(cls, pk=None):
         """Get event using identifier.
 
@@ -229,7 +269,7 @@ class Event(object):
         return None
 
     @classmethod
-    def filter(cls, limit=10, order="id DESC", **kwargs):
+    def filter(cls, limit=10, offset=0, order="id DESC", **kwargs):
         """Filter events.
 
         :Example: Event.filter(summary='Test Event', limit=10)
@@ -237,6 +277,7 @@ class Event(object):
         """
         query_order = None
         query_limit = None
+        query_offset = None
         db = get_database()
         cursor = db.cursor
         filter_data = {}
@@ -247,6 +288,9 @@ class Event(object):
         if order:
             query_order = order
             del order
+        if offset:
+            query_offset = offset
+            del offset
         # Select statement for query
         query = "SELECT * FROM " + cls.Meta.table_name
         # Add filters
@@ -260,6 +304,8 @@ class Event(object):
             query += " DESC"
         if query_limit:
             query += " LIMIT " + str(query_limit)
+        if query_offset:
+            query += " OFFSET " + str(query_offset)
         # Execute query and return result
         cursor.execute(query, filter_data)
         events = db.fetch_execution(cursor)

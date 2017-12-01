@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}{% trans %}Users Administration{% endtrans %}{% endblock %}
+{% block header %}{% endblock %}
+{% block content %}
+<section class="features text-center" id="admintools">
+  <div class="container">
+    <div class="section-heading text-center">
+      <h2>{% trans %}Active Users{% endtrans %}</h2>
+      <p>{% trans %}There are {{ users_count }} active users registered.{% endtrans %}</p>
+    </div>
+    <div class="row">
+      {% for user in users %}
+      <div class="col-lg-3 my-auto">
+        <div class="card">
+          <div class="card-body">
+            <h4 class="card-title">{{ user }}</h4>
+            <h6 class="card-subtitle mb-2 text-muted">
+              {% if user.is_staff %}{% trans %}Staff Member{% endtrans %}
+              {% elif user.is_teacher %}{% trans %}Teacher{% endtrans %}
+              {% else %}{% trans %}Student{% endtrans %}
+              {% endif %}
+            </h6>
+            <p class="card-text">
+              <i class="fa fa-envelope-o" title="{% trans %}E-mail{% endtrans %}"></i> {{ user.email }}<br/>
+              <i class="fa fa-building-o" title="{% trans %}Department{% endtrans %}"></i> {{ user.department }}
+            </p>
+            <button type="button" class="btn btn-warning">Edit</button>
+            <button type="button" class="btn btn-danger">Delete</button>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

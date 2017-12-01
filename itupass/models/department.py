@@ -33,6 +33,23 @@ class Department(object):
         return str(self.code)
 
     @classmethod
+    def count(cls, **kwargs):
+        """Get total number of users."""
+        db = get_database()
+        filter_data = {}
+        query = "SELECT count(code) FROM {table}".format(table=cls.Meta.table_name)
+        # Add filters
+        if kwargs:
+            filter_query, filter_data = db.where_builder(kwargs)
+            query += " WHERE " + filter_query
+        cursor = db.cursor
+        cursor.execute(query, filter_data)
+        result = cursor.fetchall()
+        if result:
+            return result[0][0]
+        return None
+
+    @classmethod
     def get(cls, code=None):
         """Get department using identifier.
 
@@ -55,7 +72,7 @@ class Department(object):
         return None
 
     @classmethod
-    def filter(cls, limit=10, order="code DESC", **kwargs):
+    def filter(cls, limit=10, offset=0, order="code DESC", **kwargs):
         """Filter departments.
 
         :Example: Department.filter(name='Computer Engineering', limit=10)
@@ -63,6 +80,7 @@ class Department(object):
         """
         query_order = None
         query_limit = None
+        query_offset = None
         db = get_database()
         cursor = db.cursor
         filter_data = {}
@@ -73,6 +91,9 @@ class Department(object):
         if order:
             query_order = order
             del order
+        if offset:
+            query_offset = offset
+            del offset
         # Select statement for query
         query = "SELECT * FROM " + cls.Meta.table_name
         # Add filters
@@ -86,6 +107,8 @@ class Department(object):
             query += " DESC"
         if query_limit:
             query += " LIMIT " + str(query_limit)
+        if query_offset:
+            query += " OFFSET " + str(query_offset)
         # Execute query and return result
         cursor.execute(query, filter_data)
         departments = db.fetch_execution(cursor)

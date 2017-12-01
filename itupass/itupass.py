@@ -37,6 +37,7 @@ def vcap_to_uri():
 DEFAULT_BLUEPRINTS = (
     # Add blueprints here
     (views.client, ""),
+    (views.admin, "/admin"),
 )
 
 

@@ -43,3 +43,13 @@ section.contact ul.list-social li.social-telegram a {
 .col-centered {
   margin: 0 auto;
 }
+.img-avatar {
+  height: 35px;
+  margin: 0 10px;
+  border-radius: 50em;
+  vertical-align: middle;
+  border-style: none;
+}
+.nav-item {
+  height: 55px;
+}

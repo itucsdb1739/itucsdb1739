@@ -109,7 +109,7 @@ class User(UserMixin):
         return None
 
     @classmethod
-    def filter(cls, limit=100, order="id DESC", **kwargs):
+    def filter(cls, limit=10, offset=0, order="id DESC", **kwargs):
         """Filter users.
 
         :Example: User.filter(is_staff=True, limit=10) -> get list of 10 staff members
@@ -117,6 +117,7 @@ class User(UserMixin):
         """
         query_order = None
         query_limit = None
+        query_offset = None
         db = get_database()
         cursor = db.cursor
         filter_data = {}
@@ -127,6 +128,9 @@ class User(UserMixin):
         if order:
             query_order = order
             del order
+        if offset:
+            query_offset = offset
+            del offset
         # Select statement for query
         query = "SELECT * FROM " + cls.Meta.table_name
         # Add filters
@@ -140,6 +144,8 @@ class User(UserMixin):
             query += " DESC"
         if query_limit:
             query += " LIMIT " + str(query_limit)
+        if query_offset:
+            query += " OFFSET " + str(query_offset)
         # Execute query and return result
         cursor.execute(query, filter_data)
         users = db.fetch_execution(cursor)
