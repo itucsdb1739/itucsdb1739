@@ -1,7 +1,7 @@
 from datetime import datetime
 from flask import Blueprint, render_template, request, redirect, url_for, abort
 from flask_login import login_user, login_required, logout_user, current_user
-from itupass.models import Department, User, Lecture, EventCategory, Event
+from itupass.models import Paginator, Department, User, Lecture, EventCategory, Event
 from itupass.forms import UserAdminForm
 from itupass.utils import admin_required
 
@@ -55,7 +55,7 @@ def users_admin(pk=None):
             user.save()
             return redirect(url_for('.users_admin'))
         return render_template('admin/users_edit.html', form=form, user=user)
-    items_per_page = 25
+    items_per_page = 12
     data = {"limit": items_per_page}
     try:
         page = int(request.args.get('page'))
@@ -63,18 +63,16 @@ def users_admin(pk=None):
         page = 1
     except TypeError:
         page = 1
-    if pk:
-        pass
     data["users_count"] = User.count()
-    data["pages"] = int(data["users_count"] / items_per_page + 0.99)
+    total_pages = int(data["users_count"] / items_per_page + 0.99)
     if page:
-        if (page-1) * items_per_page > data["users_count"]:
+        if page > total_pages:
             page = 1
     else:
         page = 1
-    data["current_page"] = page
     offset = (page - 1) * items_per_page
     data["users"] = User.filter(limit=items_per_page, offset=offset)
+    data["pagination"] = Paginator(current_page=page, total_pages=total_pages)
     return render_template("admin/users.html", **data)
 
 @admin.route("/users/<pk>/disable", methods=["POST"])

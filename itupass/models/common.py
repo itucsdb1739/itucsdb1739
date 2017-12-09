@@ -1,4 +1,4 @@
-"""Database Model."""
+"""Common Models."""
 
 
 class Database(object):
@@ -94,3 +94,21 @@ class Database(object):
     def close(self):
         if self.connection:
             self.connection.close()
+
+
+class Paginator(object):
+    def __init__(self, current_page=1, total_pages=1):
+        self.current_page = current_page
+        self.total_pages = total_pages
+
+    @property
+    def has_previous(self):
+        return self.current_page > 1
+
+    @property
+    def has_next(self):
+        return self.current_page < self.total_pages
+
+    @property
+    def pages(self):
+        return [x + 1 for x in range(self.total_pages)]

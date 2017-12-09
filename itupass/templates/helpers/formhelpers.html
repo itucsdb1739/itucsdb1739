@@ -12,3 +12,24 @@
     {{ field(**kwargs)|safe }}
   </div>
 {% endmacro %}
+{% macro render_pagination(paginator) %}
+<nav aria-label="{% trans %}Page Navigation{% endtrans %}">
+<ul class="pagination">
+  <li class="page-item{% if not paginator.has_previous %} disabled{% endif %}">
+    <a class="page-link" href="{{ request.path }}?page=" aria-label="{% trans %}Previous{% endtrans %}">
+      <span aria-hidden="true">&laquo;</span>
+      <span class="sr-only">{% trans %}Previous{% endtrans %}</span>
+    </a>
+  </li>
+  {% for page in paginator.pages %}
+    <li class="page-item{% if page == paginator.current_page %} active{% endif %}"><a class="page-link" href="{{ request.path }}?page={{ page }}">{{ page }}</a></li>
+  {% endfor %}
+  <li class="page-item{% if not paginator.has_next %} disabled{% endif %}">
+    <a class="page-link" href="{{ request.path }}?page=" aria-label="{% trans %}Next{% endtrans %}">
+      <span aria-hidden="true">&raquo;</span>
+      <span class="sr-only">{% trans %}Next{% endtrans %}</span>
+    </a>
+  </li>
+</ul>
+</nav>
+{% endmacro %}
