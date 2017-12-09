@@ -11,13 +11,10 @@ from raven.contrib.flask import Sentry
 
 from itupass import models
 from itupass import views
+from itupass import SUPPORTED_LANGUAGES
 
 
-SUPPORTED_LANGUAGES = [
-    'en', 'tr', 'ru'
-]
-
-__all__ = ['get_db', 'init_db', 'close_database', 'SUPPORTED_LANGUAGES']
+__all__ = ['get_db', 'init_db', 'close_database']
 
 load_dotenv(find_dotenv(), override=True)
 
@@ -49,7 +46,7 @@ class Config(object):
     WTF_CSRF_SECRET_KEY = os.environ.get("SECRET_KEY", "Not#So@Secret")
     SESSION_COOKIE_NAME = "Ssession"
     SECURITY_USER_IDENTITY_ATTRIBUTES = ['email']
-    LANGUAGES = SUPPORTED_LANGUAGES
+    LANGUAGES = SUPPORTED_LANGUAGES.keys()
     BABEL_DEFAULT_LOCALE = "en"
     BABEL_DEFAULT_TIMEZONE = "Europe/Istanbul"
 
@@ -170,7 +167,7 @@ def parse_lectures_command():
 def get_locale():
     if current_user.is_authenticated:
         return current_user.locale
-    return request.accept_languages.best_match(SUPPORTED_LANGUAGES)
+    return request.accept_languages.best_match(SUPPORTED_LANGUAGES.keys())
 
 
 # Template contexts
@@ -180,6 +177,6 @@ def utility_processor():
         return get_locale()
 
     def all_locales():
-        return SUPPORTED_LANGUAGES
+        return SUPPORTED_LANGUAGES.keys()
 
     return dict(currentlocale=currentlocale, all_locales=all_locales)

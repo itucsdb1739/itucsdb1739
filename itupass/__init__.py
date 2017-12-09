@@ -1,3 +1,4 @@
-from .itupass import app, get_db, SUPPORTED_LANGUAGES
+from .settings import SUPPORTED_LANGUAGES
+from .itupass import app, get_db
 
-__all__ = ['app', 'get_db', 'SUPPORTED_LANGUAGES']
+__all__ = ['SUPPORTED_LANGUAGES', 'app', 'get_db']

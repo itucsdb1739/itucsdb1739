@@ -56,6 +56,15 @@ section.contact ul.list-social li.social-telegram a {
 .inline-item {
   display: inline;
 }
+.form_inline_item .form-group {
+  display: inline;
+}
 .cursor-pointer {
   cursor: pointer;
+}
+.underlined {
+  text-decoration: line-through;
+}
+.pt-1em {
+  padding-top: 1em;
 }

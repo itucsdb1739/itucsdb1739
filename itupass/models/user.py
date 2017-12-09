@@ -154,17 +154,31 @@ class User(UserMixin):
             result.append(User(**user))
         return result
 
-    def delete(self):
-        """Delete current user.
+    def disable(self):
+        """Disable current user.
 
         :NOTE: Instead of deleting it will set deleted=true in user profile
-        :Example: current_user.delete()
+        :Example: current_user.disable()
         """
         if not self.pk:
             raise ValueError("User is not saved yet.")
         db = get_database()
         cursor = db.cursor
         query = "UPDATE {table} SET deleted = TRUE WHERE id=%(id)s".format(table=self.Meta.table_name)
+        cursor.execute(query, {'id': self.pk})
+        db.commit()
+
+    def delete(self):
+        """Delete current user.
+
+        :NOTE: This will only be used by admins
+        :Example: current_user.delete()
+        """
+        if not self.pk:
+            raise ValueError("User is not saved yet.")
+        db = get_database()
+        cursor = db.cursor
+        query = "DELETE FROM {table} WHERE id=%(id)s".format(table=self.Meta.table_name)
         cursor.execute(query, {'id': self.pk})
         db.commit()
 

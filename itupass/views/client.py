@@ -1,7 +1,8 @@
 from flask import Blueprint, render_template, request, redirect, url_for
 from flask_login import login_user, login_required, logout_user, current_user
 from itupass.models import User, Event, Department
-from itupass.forms import UserForm, LoginForm
+from itupass.forms import UserRegistrationForm, LoginForm
+from itupass import SUPPORTED_LANGUAGES
 
 client = Blueprint('client', __name__)
 
@@ -35,7 +36,7 @@ def login():
 def register():
     if current_user.is_authenticated:
         return redirect(url_for('.index'))
-    form = UserForm(request.form)
+    form = UserRegistrationForm(request.form)
     form.department.choices = [(dep.code, dep.__str__()) for dep in Department.filter(limit=100, order="code ASC")]
     is_teacher = request.form.get('is_teacher', None) == 'on'
     if request.method == 'POST' and form.validate():
@@ -59,8 +60,7 @@ def register():
 def change_lang():
     if request.method == 'GET':
         return redirect(url_for('.index'))
-    from itupass import SUPPORTED_LANGUAGES
-    _next = request.args.get('next')
+    _next = request.form.get('next')
     new_lang = request.form.get('lang', None)
     if new_lang and new_lang in SUPPORTED_LANGUAGES:
         current_user.locale = new_lang

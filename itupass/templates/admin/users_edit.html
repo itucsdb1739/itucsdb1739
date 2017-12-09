@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% from "helpers/formhelpers.html" import render_field %}
+{% block title %}{{ user }}{% endblock %}
+{% block content %}
+<section class="features text-center" id="edit-user">
+  <div class="container">
+    <div class="section-heading text-center">
+      <h2>{% trans %}Edit User{% endtrans %}</h2>
+      {% if errors %}<p class="error-message">{{ errors }}</p>{% endif %}
+    </div>
+    <div class="row">
+      <div class="col-md-5 col-centered">
+        <form method=post action="{{ url_for('.users_admin', pk=user.pk) }}">
+          <fieldset>
+            {% for field in form %}
+              <div class="form_inline_item">
+                {% if field.widget.input_type != 'hidden' %}{{ field.label }}: {% endif %}{{ render_field(field) }}
+              </div>
+            {% endfor %}
+            <div class="form-group pt-1em">
+              <button type="submit" class="btn btn-primary">{% trans %}Save{% endtrans %}</button>
+              <a href="{{ url_for('.users_admin') }}">
+                <button type="button" class="btn btn-light">{% trans %}Cancel{% endtrans %}</button>
+              </a>
+            </div>
+          </fieldset>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
