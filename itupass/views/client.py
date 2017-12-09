@@ -26,7 +26,9 @@ def login():
             if not login_status:
                 return render_template('user/login.html', form=form, errors="User Disabled, Contact Support!")
             _next = request.args.get('next')
-            return redirect(_next or url_for('.index'))
+            if _next and _next == "/":
+                _next = None
+            return redirect(_next or url_for('dashboard.index'))
         else:
             return render_template('user/login.html', form=form, errors="Wrong Credentials")
     return render_template('user/login.html', form=form)
