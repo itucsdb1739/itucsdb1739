@@ -36,6 +36,10 @@ class UserForm(FlaskForm):
             "class": "form-control"
         }
     )
+    department = SelectField(
+        _("Department"), validators=[DataRequired()],
+        choices=[]
+    )
 
     def validate_email(self, field):
         """Check for university email domain."""

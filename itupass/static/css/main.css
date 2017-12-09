@@ -53,3 +53,9 @@ section.contact ul.list-social li.social-telegram a {
 .nav-item {
   height: 55px;
 }
+.inline-item {
+  display: inline;
+}
+.cursor-pointer {
+  cursor: pointer;
+}

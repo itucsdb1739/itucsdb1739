@@ -24,8 +24,11 @@
               <i class="fa fa-envelope-o" title="{% trans %}E-mail{% endtrans %}"></i> {{ user.email }}<br/>
               <i class="fa fa-building-o" title="{% trans %}Department{% endtrans %}"></i> {{ user.department }}
             </p>
-            <button type="button" class="btn btn-warning">Edit</button>
-            <button type="button" class="btn btn-danger">Delete</button>
+            <button type="button" class="btn btn-warning disabled cursor-pointer">{% trans %}Edit{% endtrans %}</button>
+            <form action="{{ url_for('admin.users_delete', pk=user.pk) }}" method="post" class="inline-item">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+              <button type="submit" class="btn btn-danger cursor-pointer">{% trans %}Delete{% endtrans %}</button>
+            </form>
           </div>
         </div>
       </div>

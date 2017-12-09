@@ -17,7 +17,7 @@ class Department(object):
             setattr(self, key, vars().get(key))
 
     def __str__(self):
-        return self.name
+        return "{code}: {name}".format(code=self.code, name=self.name)
 
     def __repr__(self):
         return '<Department {code}: {name}>'.format(code=self.code, name=self.name)

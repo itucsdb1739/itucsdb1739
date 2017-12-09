@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for
 from flask_login import login_user, login_required, logout_user, current_user
-from itupass.models import User, Event
+from itupass.models import User, Event, Department
 from itupass.forms import UserForm, LoginForm
 
 client = Blueprint('client', __name__)
@@ -36,12 +36,14 @@ def register():
     if current_user.is_authenticated:
         return redirect(url_for('.index'))
     form = UserForm(request.form)
+    form.department.choices = [(dep.code, dep.__str__()) for dep in Department.filter(limit=100, order="code ASC")]
     is_teacher = request.form.get('is_teacher', None) == 'on'
     if request.method == 'POST' and form.validate():
         user = User(
             email=form.email.data,
             password=form.password.data,
             name=form.name.data,
+            department=form.department.data,
             is_teacher=is_teacher
         )
         # @TODO disable if is_teacher is true for manual confirmation.
