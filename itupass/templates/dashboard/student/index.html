@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}{% trans %}Dashboard{% endtrans %}{% endblock %}
+{% block content %}
+<section class="features text-center" id="lectures">
+  <div class="container">
+    <div class="section-heading text-center">
+      <h2>{% trans %}Registered Lectures{% endtrans %}</h2>
+      <p><a href="{{ url_for('dashboard.add_lecture') }}"><i class="fa fa-plus-circle"></i> {% trans %}Register New Lecture{% endtrans %}</a></p>
+    </div>
+    <div class="row">
+      {% for registration in registrations %}
+      <div class="col-lg-3 my-auto">
+        <div class="feature-item">
+          <i class="fa fa-book text-primary"></i>
+          <h3>{{ registration.lecture_object }}</h3>
+          <p class="text-muted">
+            <div class="row">
+              <div class="col-lg-3">
+                <i class="fa fa-hashtag" title="CRN"></i> {{ registration.lecture_object.crn }}
+              </div>
+              <div class="col-lg-3">
+                <i class="fa fa-code" title="{% trans %}Code{% endtrans %}"></i> {{ registration.lecture_object.code }}
+              </div>
+              <div class="col-lg-3">
+                <i class="fa fa-university" title="Instructor"></i> {{ registration.lecture_object.instructor }}
+              </div>
+            </div>
+          </p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+<section class="features text-center" id="lectures">
+  <div class="container">
+    <div class="section-heading text-center">
+      <h2>{% trans %}Upcoming Events{% endtrans %}</h2>
+      <p><a href=""><i class="fa fa-plus-circle"></i> {% trans %}Subscription Preferences{% endtrans %}</a></p>
+    </div>
+    <div class="row">
+      {% for event in events %}
+      <div class="col-lg-3 my-auto">
+        <div class="feature-item icon-orange">
+          {% if event.category.slug == "academic-calendar" %}
+          <i class="fa fa-graduation-cap text-primary"></i>
+          {% elif event.category.slug == "cs-news" or event.category.slug == "cs-events" %}
+          <i class="fa fa-code text-primary"></i>
+          {% else %}
+          <i class="fa fa-calendar text-primary"></i>
+          {% endif %}
+          <h3>{{ event.date.strftime('%d %b %Y') }}</h3>
+          <p class="text-muted">{{ event.summary }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

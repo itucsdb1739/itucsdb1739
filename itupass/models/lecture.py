@@ -1,7 +1,7 @@
 from datetime import datetime
 from flask import current_app
 from collections import OrderedDict
-from itupass.models import Department
+from itupass.models import Department, User
 
 
 def get_database():
@@ -54,6 +54,12 @@ class Lecture(object):
             result.append(Department.get(code=department['department']))
         return result
 
+    @property
+    def schedule(self):
+        if not self.pk:
+            return None
+        return LectureSchedule.filter(lecture=self.pk)
+
     def add_department(self, department):
         if not isinstance(department, Department):
             department = Department.get(code=department)
@@ -67,6 +73,21 @@ class Lecture(object):
         )
         db.commit()
         return True
+
+    @classmethod
+    def department_lectures(cls, department, limit=100):
+        db = get_database()
+        cursor = db.cursor
+        cursor.execute(
+            """SELECT lecture FROM lecture_departments WHERE department=%(department)s
+            LIMIT {limit}""".format(limit=limit),
+            {'department': department}
+        )
+        lectures = cursor.fetchall()
+        result = []
+        for lecture in lectures:
+            result.append(Lecture.get(pk=lecture[0]))
+        return result
 
     @classmethod
     def count(cls, **kwargs):
@@ -433,3 +454,189 @@ class LectureSchedule(object):
 
     class Meta:
         table_name = 'lecture_schedule'
+
+
+class UserLecture(object):
+    columns = OrderedDict([
+        ('pk', None),
+        ('student', None),
+        ('lecture', None),
+        ('created_at', None)
+    ])
+
+    def __init__(self, pk=None, student=None, lecture=None, created_at=datetime.now()):
+        for key in self.columns:
+            setattr(self, key, vars().get(key))
+
+    def __str__(self):
+        return "Lecture {lecture} for {student}".format(lecture=self.lecture, student=self.student)
+
+    def __repr__(self):
+        return '<UserLecture {pk}>'.format(pk=self.pk)
+
+    def get_values(self):
+        """Get values of object as dict object."""
+        values = self.columns.copy()
+        for key in self.columns:
+            values[key] = getattr(self, key)
+        return values
+
+    def get_id(self):
+        return str(self.pk)
+
+    @property
+    def lecture_object(self):
+        return Lecture.get(pk=self.lecture)
+
+    @classmethod
+    def count(cls, **kwargs):
+        """Get total number of lecture registrations."""
+        db = get_database()
+        filter_data = {}
+        query = "SELECT count(id) FROM {table}".format(table=cls.Meta.table_name)
+        # Add filters
+        if kwargs:
+            filter_query, filter_data = db.where_builder(kwargs)
+            query += " WHERE " + filter_query
+        cursor = db.cursor
+        cursor.execute(query, filter_data)
+        result = cursor.fetchall()
+        if result:
+            return result[0][0]
+        return None
+
+    def get_schedules(self):
+        if not self.lecture:
+            return None
+        return LectureSchedule.filter(lecture=self.lecture)
+
+    @classmethod
+    def get(cls, pk=None, student=None, lecture=None):
+        """Get lecture registration using identifier.
+
+        :example: user_lecture.get(registration_id)
+        :rtype: UserLecture or None
+        """
+        db = get_database()
+        cursor = db.cursor
+        if pk:
+            cursor.execute(
+                "SELECT * FROM {table} WHERE (id=%(pk)s)".format(table=cls.Meta.table_name),
+                {'pk': pk}
+            )
+        elif student and lecture:
+            cursor.execute(
+                "SELECT * FROM {table} WHERE (student=%(student)s and lecture=%(lecture)s)".format(
+                    table=cls.Meta.table_name
+                ), {'student': student, 'lecture': lecture}
+            )
+        else:
+            # @TODO raise exception, not enough arguments!
+            return None
+        registration = db.fetch_execution(cursor)
+        if registration:
+            return UserLecture(**registration[0])
+        return None
+
+    @classmethod
+    def filter(cls, limit=10, offset=0, order="id DESC", **kwargs):
+        """Filter lecture registrations.
+
+        :Example: user_lecture.filter(student=1, limit=10)
+        :rtype: list
+        """
+        query_order = None
+        query_limit = None
+        query_offset = None
+        db = get_database()
+        cursor = db.cursor
+        filter_data = {}
+        # Delete non-filter data
+        if limit:
+            query_limit = limit
+            del limit
+        if order:
+            query_order = order
+            del order
+        if offset:
+            query_offset = offset
+            del offset
+        # Select statement for query
+        query = "SELECT * FROM " + cls.Meta.table_name
+        # Add filters
+        if kwargs:
+            filter_query, filter_data = db.where_builder(kwargs)
+            query += " WHERE " + filter_query
+        # Add order and limit if set
+        if query_order:
+            query += " ORDER BY " + query_order
+        if 'ASC' not in query_order and 'DESC' not in query_order:
+            query += " DESC"
+        if query_limit:
+            query += " LIMIT " + str(query_limit)
+        if query_offset:
+            query += " OFFSET " + str(query_offset)
+        # Execute query and return result
+        cursor.execute(query, filter_data)
+        registrations = db.fetch_execution(cursor)
+        result = []
+        for registration in registrations:
+            result.append(UserLecture(**registration))
+        return result
+
+    def delete(self):
+        """Delete current lecture registration.
+
+        :Example: user_lecture.delete()
+        """
+        if not self.pk:
+            raise ValueError("UserLecture is not saved yet.")
+        db = get_database()
+        cursor = db.cursor
+        query = "DELETE FROM {table} WHERE id=%(pk)s".format(table=self.Meta.table_name)
+        cursor.execute(query, {'pk': self.pk})
+        db.commit()
+
+    def save(self):
+        db = get_database()
+        cursor = db.cursor
+        data = self.get_values()
+        registration = None
+        if self.pk:
+            registration = self.get(pk=self.pk)
+        if registration:
+            # update old registration
+            old_data = registration.get_values()
+            diffkeys = [key for key in data if data[key] != old_data[key]]
+            if not diffkeys:
+                # Nothing changed
+                return registration
+            filters = {}
+            for key in diffkeys:
+                filters[key] = self.get_values()[key]
+            query = "UPDATE {table} SET ".format(table=self.Meta.table_name)
+            for key in filters:
+                query += key + ' = %(' + key + ')s, '
+            # Remove last comma
+            query = query.rstrip(', ') + ' '
+            # Add filter
+            query += "WHERE id={pk}".format(pk=registration.pk)
+            cursor.execute(query, filters)
+            db.commit()
+            # Return saved registration
+            return self.get(pk=registration.pk)
+        # new registration
+        del data['pk']
+        query = "INSERT INTO {table} " \
+                "(student, lecture, created_at) " \
+                "VALUES" \
+                "(%(student)s, %(lecture)s, %(created_at)s) RETURNING id".format(
+                    table=self.Meta.table_name
+                )
+        cursor.execute(query, dict(data))
+        db.commit()
+        new_row_pk = cursor.fetchone()[0]
+        return self.get(pk=new_row_pk)
+
+    class Meta:
+        table_name = 'user_lectures'
