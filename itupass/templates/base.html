@@ -44,6 +44,7 @@
               <div class="dropdown-header text-center">
                 <strong>{% trans %}Account{% endtrans %}</strong>
               </div>
+              <a class="dropdown-item" href="{{ url_for('dashboard.index') }}"><i class="fa fa-tachometer"></i> {% trans %}Dashboard{% endtrans %}</a>
               <a class="dropdown-item" href="{{ url_for('client.logout') }}"><i class="fa fa-lock"></i> {% trans %}Sign Out{% endtrans %}</a>
               {% if current_user.is_staff %}
               <div class="dropdown-header text-center">

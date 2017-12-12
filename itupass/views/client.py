@@ -1,6 +1,6 @@
-from flask import Blueprint, render_template, request, redirect, url_for
+from flask import Blueprint, render_template, request, redirect, url_for, make_response
 from flask_login import login_user, login_required, logout_user, current_user
-from itupass.models import User, Event, Department
+from itupass.models import User, Event, Department, UserLecture
 from itupass.forms import UserRegistrationForm, LoginForm
 from itupass import SUPPORTED_LANGUAGES
 
@@ -26,7 +26,9 @@ def login():
             if not login_status:
                 return render_template('user/login.html', form=form, errors="User Disabled, Contact Support!")
             _next = request.args.get('next')
-            return redirect(_next or url_for('.index'))
+            if _next and _next == "/":
+                _next = None
+            return redirect(_next or url_for('dashboard.index'))
         else:
             return render_template('user/login.html', form=form, errors="Wrong Credentials")
     return render_template('user/login.html', form=form)
@@ -73,3 +75,16 @@ def change_lang():
 def logout():
     logout_user()
     return redirect(url_for('.index'))
+
+
+@client.route("/ics/<pk>")
+def ics_file(pk):
+    user = User.get(pk=pk)
+    if not user:
+        abort(404)
+    registrations = UserLecture.filter(student=user.pk, limit=100)
+    events = Event.get_next_events(limit=8, populate_categories=True)
+    response = make_response(render_template('template.ics', registrations=registrations, events=events))
+    response.headers['Content-Type'] = 'text/calendar; charset=utf-8'
+    response.headers['Content-Disposition'] = 'attachement; filename=itupass-calendar.ics'
+    return response

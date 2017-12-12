@@ -35,6 +35,7 @@ DEFAULT_BLUEPRINTS = (
     # Add blueprints here
     (views.client, ""),
     (views.admin, "/admin"),
+    (views.dashboard, "/dashboard"),
 )
 
 

@@ -55,6 +55,13 @@ CREATE TABLE lecture_schedule (
   start_time    TIME default NULL,
   end_time      TIME default NULL
 );
+DROP TABLE IF EXISTS user_lectures;
+CREATE TABLE user_lectures (
+  id          SERIAL PRIMARY KEY,
+  student     INTEGER REFERENCES users ON DELETE CASCADE,
+  lecture     INTEGER REFERENCES lectures ON DELETE CASCADE,
+  created_at  TIMESTAMP DEFAULT NULL
+);
 
 DROP TABLE IF EXISTS events;
 DROP TABLE IF EXISTS event_categories CASCADE;

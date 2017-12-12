@@ -68,3 +68,13 @@ section.contact ul.list-social li.social-telegram a {
 .pt-1em {
   padding-top: 1em;
 }
+#lectureFilterInput {
+  width: 100%;
+  background-image: url('../img/search.png');
+  background-position: 10px 10px;
+  background-repeat: no-repeat;
+  font-size: 16px;
+  padding: 12px 20px 12px 40px;
+  border: 1px solid #ddd;
+  margin-bottom: 12px;
+}
