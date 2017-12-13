@@ -40,7 +40,7 @@ def add_lecture():
             abort(404)
         registration = UserLecture(student=current_user.pk, lecture=lecture)
         registration.save()
-        return redirect('dashboard.index')
+        return redirect(url_for('dashboard.index'))
     choosen_department = request.args.get('department')
     if not choosen_department:
         departments = Department.filter(limit=100)
