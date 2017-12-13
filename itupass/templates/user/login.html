@@ -12,8 +12,6 @@
       <div class="col-md-5 col-centered">
         <form method=post action="{{ url_for('.login') }}?next={{ request.args.get('next', '/') }}">
           <fieldset>
-            {{ form.csrf_token }}
-            {{ form.hidden_tag() }}
             {% for field in form %}
               {{ render_field(field) }}
             {% endfor %}
