@@ -45,5 +45,5 @@ def add_lecture():
     if not choosen_department:
         departments = Department.filter(limit=100)
         return render_template('dashboard/student/add_lecture.html', departments=departments)
-    lectures = Lecture.department_lectures(department=choosen_department)
+    lectures = Lecture.department_lectures(department=choosen_department, limit=200)
     return render_template('dashboard/student/add_lecture.html', lectures=lectures)

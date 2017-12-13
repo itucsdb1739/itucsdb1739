@@ -5,6 +5,7 @@ from flask_wtf.csrf import CSRFProtect
 from flask_gravatar import Gravatar
 import psycopg2
 import os
+from datetime import timedelta
 from dotenv import load_dotenv, find_dotenv
 import json
 from raven.contrib.flask import Sentry
@@ -180,4 +181,8 @@ def utility_processor():
     def all_locales():
         return SUPPORTED_LANGUAGES.keys()
 
-    return dict(currentlocale=currentlocale, all_locales=all_locales)
+    def event_start_date(start_time, week_day):
+        day_difference = start_time.weekday() - 1 + week_day
+        return start_time - timedelta(days=day_difference)
+
+    return dict(currentlocale=currentlocale, all_locales=all_locales, event_start_date=event_start_date)
