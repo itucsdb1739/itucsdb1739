@@ -183,6 +183,6 @@ def utility_processor():
 
     def event_start_date(start_time, week_day):
         day_difference = start_time.weekday() - 1 + week_day
-        return start_time - timedelta(days=day_difference)
+        return start_time + timedelta(days=day_difference)
 
     return dict(currentlocale=currentlocale, all_locales=all_locales, event_start_date=event_start_date)
