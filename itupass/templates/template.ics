@@ -1,0 +1,18 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//ITUPass Schedule
+CALSCALE:GREGORIAN
+X-WR-CALNAME:ITUPass - Schedule
+X-WR-RELCALID:ITUPass - Schedule
+X-WR-TIMEZONE:Europe/Istanbul{% for registration in registrations %}{% if registration.lecture_object and registration.lecture_object.schedule.0 %}
+BEGIN:VEVENT
+DTSTAMP:{{ now.strftime("%Y%m%dT%H%M%S") }}Z
+DTSTART;TZID=Europe/Istanbul:{{ event_start_date(start_time, registration.lecture_object.schedule.0.day_of_week).strftime("%Y%m%d")}}T{{ registration.lecture_object.schedule.0.start_time.strftime("%H%M%S") }}
+DTEND;TZID=Europe/Istanbul:{{ event_start_date(start_time, registration.lecture_object.schedule.0.day_of_week).strftime("%Y%m%d")}}T{{ registration.lecture_object.schedule.0.end_time.strftime("%H%M%S") }}
+RRULE:FREQ=WEEKLY;INTERVAL=1;COUNT=15
+SUMMARY:{{ registration.lecture_object }}
+DESCRIPTION: CRN - {{ registration.lecture_object.crn }}
+UID:{{ registration.lecture_object.pk }}@itupass
+LOCATION:{{ registration.lecture_object.schedule.0.room }}
+END:VEVENT{% endif %}{% endfor %}
+END:VCALENDAR

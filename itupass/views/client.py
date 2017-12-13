@@ -3,6 +3,7 @@ from flask_login import login_user, login_required, logout_user, current_user
 from itupass.models import User, Event, Department, UserLecture
 from itupass.forms import UserRegistrationForm, LoginForm
 from itupass import SUPPORTED_LANGUAGES
+from datetime import datetime
 
 client = Blueprint('client', __name__)
 
@@ -79,12 +80,17 @@ def logout():
 
 @client.route("/ics/<pk>")
 def ics_file(pk):
+    pk = pk.replace('.ics', '')
+    now = datetime.utcnow()
+    start_time = datetime(year=2017, month=9, day=11)
     user = User.get(pk=pk)
     if not user:
         abort(404)
     registrations = UserLecture.filter(student=user.pk, limit=100)
     events = Event.get_next_events(limit=8, populate_categories=True)
-    response = make_response(render_template('template.ics', registrations=registrations, events=events))
+    response = make_response(render_template(
+        'template.ics', registrations=registrations, events=events, now=now, start_time=start_time
+    ).replace('\n\n\n', '\n').replace('\n\n', '\n').replace('\n', '\r\n'))
     response.headers['Content-Type'] = 'text/calendar; charset=utf-8'
     response.headers['Content-Disposition'] = 'attachement; filename=itupass-calendar.ics'
     return response

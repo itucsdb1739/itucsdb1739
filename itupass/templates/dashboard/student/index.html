@@ -5,7 +5,7 @@
   <div class="container">
     <div class="section-heading text-center">
       <h2>{% trans %}ICS Subscription{% endtrans %}</h2>
-      <p><a href="{{ url_for('client.ics_file', pk=current_user.pk) }}"><i class="fa fa-calendar"></i> {% trans %}ICS File URL{% endtrans %}</a></p>
+      <p><a href="{{ url_for('client.ics_file', pk=current_user.pk) }}.ics"><i class="fa fa-calendar"></i> {% trans %}ICS File URL{% endtrans %}</a></p>
     </div>
     <div class="row">
       <div class="col-lg-12 my-auto">
