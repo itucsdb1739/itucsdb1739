@@ -40,7 +40,7 @@
       <div class="col-lg-3 my-auto">
         <div class="feature-item">
           <i class="fa fa-calendar text-primary"></i>
-          <h3><a href="#">{% trans %}Events ({{ events_count }}){% endtrans %}</a></h3>
+          <h3><a href="{{ url_for('admin.events_admin') }}">{% trans %}Events ({{ events_count }}){% endtrans %}</a></h3>
           <p class="text-muted">{% trans %}Academic and department related events.{% endtrans %}</p>
         </div>
       </div>

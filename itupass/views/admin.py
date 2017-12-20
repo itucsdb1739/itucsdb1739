@@ -2,7 +2,7 @@ from datetime import datetime
 from flask import Blueprint, render_template, request, redirect, url_for, abort
 from flask_login import login_user, login_required, logout_user, current_user
 from itupass.models import Paginator, Department, User, Lecture, EventCategory, Event
-from itupass.forms import UserAdminForm, LectureForm
+from itupass.forms import UserAdminForm, LectureForm, EventForm
 from itupass.utils import admin_required
 
 admin = Blueprint('admin', __name__)
@@ -162,3 +162,63 @@ def lectures_delete(pk):
         return abort(404)
     lecture.delete()
     return redirect(url_for('.lectures_admin'))
+
+# Events
+@admin.route("/events")
+@admin.route("/events/<pk>", methods=["GET", "POST"])
+@login_required
+@admin_required
+def events_admin(pk=None):
+    if pk:
+        event = Event.get(pk=pk)
+        if not event:
+            abort(404)
+        if request.form:
+            form = EventForm(request.form)
+        else:
+            form = EventForm(
+                summary=event.summary,
+                date=event.date,
+                end_date=event.end_date,
+                url=event.url,
+            )
+        if request.method == 'POST' and form.validate():
+            event.summary = form.summary.data
+            event.date = form.date.data
+            event.end_date = form.end_date.data
+            event.url = form.url.data
+            event.save()
+            return redirect(url_for('.events_admin'))
+        return render_template('admin/events_edit.html', form=form, event=event)
+    items_per_page = 12
+    data = {"limit": items_per_page}
+    try:
+        page = int(request.args.get('page'))
+    except ValueError:
+        page = 1
+    except TypeError:
+        page = 1
+    data["events_count"] = Event.count()
+    total_pages = int(data["events_count"] / items_per_page + 0.99)
+    if page:
+        if page > total_pages:
+            page = 1
+    else:
+        page = 1
+    offset = (page - 1) * items_per_page
+    data["events"] = Event.filter(limit=items_per_page, offset=offset)
+    data["pagination"] = Paginator(current_page=page, total_pages=total_pages)
+    return render_template("admin/events.html", **data)
+
+@admin.route("/events/<pk>/delete", methods=["POST"])
+@login_required
+@admin_required
+def events_delete(pk):
+    try:
+        event = Event.get(pk=int(pk))
+    except Exception:
+        event = None
+    if not event:
+        return abort(404)
+    event.delete()
+    return redirect(url_for('.events_admin'))
