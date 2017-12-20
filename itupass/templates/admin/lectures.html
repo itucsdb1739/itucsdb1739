@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% from "helpers/formhelpers.html" import render_pagination %}
+{% block title %}{% trans %}Lectures Administration{% endtrans %}{% endblock %}
+{% block header %}{% endblock %}
+{% block content %}
+<section class="features text-center" id="admintools">
+  <div class="container">
+    <div class="section-heading text-center">
+      <h2>{% trans %}Lectures{% endtrans %}</h2>
+      <p>{% trans %}There are {{ lectures_count }} lectures.{% endtrans %}</p>
+    </div>
+    <div class="row">
+      {% for lecture in lectures %}
+      <div class="col-lg-3 my-auto">
+        <div class="card">
+          <div class="card-body">
+            <h4 class="card-title">
+              <a href="{{ url_for('admin.lectures_admin', pk=lecture.pk) }}">
+                {{ lecture }}
+              </a>
+            </h4>
+            <h6 class="card-subtitle mb-2 text-muted">
+              {{ lecture.instructor }}
+            </h6>
+            <p class="card-text">
+            </p>
+            <form action="{{ url_for('admin.lectures_delete', pk=lecture.pk) }}" method="post" class="inline-item">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+              <button type="submit" class="btn btn-danger cursor-pointer">{% trans %}Delete{% endtrans %}</button>
+            </form>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="pt-1em"></div>
+    {{ render_pagination(pagination) }}
+  </div>
+</section>
+{% endblock %}

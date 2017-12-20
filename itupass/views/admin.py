@@ -2,7 +2,7 @@ from datetime import datetime
 from flask import Blueprint, render_template, request, redirect, url_for, abort
 from flask_login import login_user, login_required, logout_user, current_user
 from itupass.models import Paginator, Department, User, Lecture, EventCategory, Event
-from itupass.forms import UserAdminForm
+from itupass.forms import UserAdminForm, LectureForm
 from itupass.utils import admin_required
 
 admin = Blueprint('admin', __name__)
@@ -100,3 +100,65 @@ def users_delete(pk):
         return abort(404)
     user.delete()
     return redirect(url_for('.users_admin'))
+
+### Lectures
+@admin.route("/lectures")
+@admin.route("/lectures/<pk>", methods=["GET", "POST"])
+@login_required
+@admin_required
+def lectures_admin(pk=None):
+    if pk:
+        lecture = Lecture.get(pk=pk)
+        if not lecture:
+            abort(404)
+        if request.form:
+            form = LectureForm(request.form)
+        else:
+            form = LectureForm(
+                name=lecture.name,
+                crn=lecture.crn,
+                code=lecture.code,
+                instructor=lecture.instructor,
+                year=lecture.year,
+            )
+        if request.method == 'POST' and form.validate():
+            lecture.name = form.name.data
+            lecture.crn = form.crn.data
+            lecture.code = form.code.data
+            lecture.instructor = form.instructor.data
+            lecture.year = form.year.data
+            lecture.save()
+            return redirect(url_for('.lectures_admin'))
+        return render_template('admin/lectures_edit.html', form=form, lecture=lecture)
+    items_per_page = 12
+    data = {"limit": items_per_page}
+    try:
+        page = int(request.args.get('page'))
+    except ValueError:
+        page = 1
+    except TypeError:
+        page = 1
+    data["lectures_count"] = Lecture.count()
+    total_pages = int(data["lectures_count"] / items_per_page + 0.99)
+    if page:
+        if page > total_pages:
+            page = 1
+    else:
+        page = 1
+    offset = (page - 1) * items_per_page
+    data["lectures"] = Lecture.filter(limit=items_per_page, offset=offset)
+    data["pagination"] = Paginator(current_page=page, total_pages=total_pages)
+    return render_template("admin/lectures.html", **data)
+
+@admin.route("/lectures/<pk>/delete", methods=["POST"])
+@login_required
+@admin_required
+def lectures_delete(pk):
+    try:
+        lecture = Lecture.get(pk=int(pk))
+    except Exception:
+        lecture = None
+    if not lecture:
+        return abort(404)
+    lecture.delete()
+    return redirect(url_for('.lectures_admin'))
